@@ -32,7 +32,11 @@ def main():
         print("Usage: python tests/test_analyze_marks.py code/prompt_a.py")
         sys.exit(1)
 
-    analyze_marks = load_function(sys.argv[1])
+    try:
+        analyze_marks = load_function(sys.argv[1])
+    except Exception as e:
+        print(f"ERROR: {type(e).__name__}: {e}")
+        return
 
     def test_1():
         result = analyze_marks([40, 60, 80], 50)
