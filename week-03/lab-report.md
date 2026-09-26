@@ -327,7 +327,7 @@ every generated requirement with the scenario's explicit out-of-scope list, the 
 
 2. The assistant got useful structure right quickly. It produced six user stories covering the six supplied use cases, 
 added priorities and assumptions, and produced a PlantUML diagram with the required actors and use cases. 
-Creating this initial structure by hand would have taken noticeably longer, especially writing and organizing the six stories and diagram syntax.
+Creating this initial structure by hand would have taken noticeably longer, especially writing and organizing the six stories and PlantUML diagram syntax.
 
 
 3. I would rewrite US-02 Book a room first before handing the requirements to an implementer. It contains the most important business rules: the 
