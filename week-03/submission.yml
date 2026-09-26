@@ -1,0 +1,38 @@
+schema: 1
+week: "03"
+
+student:
+  name: "Khalenov Birzhan"
+  student_id: "25B030042"
+  github: "birjan777"
+
+assistant:
+  tool: "Gemini"
+  model: "3.6 Flash"
+
+counts:
+  user_stories: 6
+  acceptance_criteria_sets: 3
+
+checker:
+  pass: 23
+  fail: 0
+  error: 0
+  commit: "53573f4"
+
+assumptions:
+  overlap_touching_bookings: "allowed"
+  exactly_two_hours: "allowed"
+
+traceability:
+  use_cases_not_covered: [UC-01, UC-05, UC-06]
+  stories_not_traced: []
+
+review_findings:
+  - "US-01 View availability was revised to remove out-of-scope equipment, sensors, and other invented details."
+  - "US-02 Book room was revised to use only the supplied booking rules: future start, maximum two hours, no overlap, and blocked rooms cannot be booked."
+  - "UC-01 View availability, UC-05 Review usage, and UC-06 Send confirmation have no acceptance criteria because criteria were written only for the three selected stories."
+
+honesty:
+  can_explain_everything_submitted: "yes"
+  ai_usage_disclosed: "yes"
