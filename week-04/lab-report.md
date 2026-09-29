@@ -8,17 +8,19 @@
 
 ## 1. Setup
 
-| Field | Value |
-| --- | --- |
-| Name | <your name> |
-| Group | <your group> |
-| AI assistant | <e.g. Claude, ChatGPT, Gemini, DeepSeek, Grok> |
-| Exact model | <the exact model name with its version, e.g. claude-sonnet-4-5> |
-| Renderer | <PlantUML web server / VS Code extension / IntelliJ plugin / local jar> |
-| Behaviour diagram | <sequence / activity / both> |
-| Stories used | <my week-03 stories, revised / the reference set from README §3> |
+## 1. Setup
 
+| Field             | Value                            |
+|-------------------|----------------------------------|
+| Name              | Khalenov Birzhan                 |
+| Group             | 25B030042                        |
+| AI assistant      | Gemini                           |
+| Exact model       | Gemini 3.6 Flash                 |
+| Renderer          | PlantUML web server              |
+| Behaviour diagram | sequence                         |
+| Stories used      | the reference set from README §3 |
 ---
+
 
 ## 2. Prompts as sent
 
@@ -28,32 +30,34 @@ AI's first replies are saved as files in `models/original/` — do not paste the
 ### 2.1 Task 1 — use-case prompt
 
 ```text
-<paste>
+Using the supplied scenario and approved stories, generate PlantUML for a use-case diagram. Include Student and Administrator outside a named system boundary. Model their goals, show justified associations, and list assumptions. Use include or extend only with a clear reason.
 ```
 
 ### 2.2 Task 2 — class prompt
 
 ```text
-<paste>
+Create a UML domain class diagram in PlantUML for Smart Campus. Start with Student, Room, and Booking. Add attributes, appropriate operations, and association multiplicities. Add other classes only when requirements justify them. Explain each relationship and list assumptions. Avoid unjustified inheritance or composition.
 ```
 
 ### 2.3 Task 3 — behaviour prompt (3A sequence or 3B activity)
 
 ```text
-<paste>
+Generate PlantUML for Book room. Use Student, BookingService, and BookingRepository lifelines. Validate the supplied rules, then attempt the reservation. Show a successful confirmation and an unavailable-room alternative using alt. Label messages and replies. Explain new design components and all assumptions.
 ```
 
 ### 2.4 Focused correction prompts (if you sent any)
 
 ```text
-<paste, or write "none">
+none
 ```
 
 ### 2.5 Critique prompt
 
 ```text
-<paste>
+Compare my diagrams with the requirements. Identify missing rules, inconsistent names, and unjustified elements. Cite each issue and propose a specific correction.
 ```
+
+ 
 
 ---
 
@@ -76,14 +80,14 @@ proves it is a problem.
 
 ## 4. Task 2 — class diagram review
 
-### 4.1 Relationships, read both ways
 
-One row per association in your **revised** class diagram.
+### 4.1 Associations
 
-| Association         | Read left → right               | Read right → left                            | Multiplicities |
-|---------------------|---------------------------------|----------------------------------------------|----------------|
-| <Student — Booking> | one student makes 0..* bookings | <each booking belongs to exactly 1 student>  | <1 / 0..*>     |
-| <Room — Booking>    | one room has 0..* bookings      | <each booking belongs to exactly 1 room>     | <1 / 0..*>     |
+| Association       | Direction / meaning                               | Multiplicity                                  |
+|-------------------|---------------------------------------------------|-----------------------------------------------|
+| Student — Booking | Student makes Booking; Booking belongs to Student | Student 1 → Booking 0..*; Booking → Student 1 |
+| Room — Booking    | Room contains Booking; Booking belongs to Room    | Room 1 → Booking 0..*; Booking → Room 1       |
+
 
 ### 4.2 Constraints the multiplicities cannot show
 
@@ -159,23 +163,60 @@ diagram**, spelled exactly as in the diagram, with the story ID it traces to.
 At least **three** rows, and at least one for each required diagram (use case, class, your
 behaviour diagram). "Before" is what the AI produced; "After" is what you submitted.
 
-| #    | Diagram  | Before (AI's original)                                                                       | After (your revision)                                                                                                                         | Reason                                                                                                                                                                                                   |
-|------|----------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1    | use case | `Book Study Room` and a separate `Generate Booking Confirmation` use case with `<<include>>` | `Book Room` is the use case; confirmation is represented as an outcome in the R4 note                                                         | A confirmation is an outcome of a successful booking, not a separate student goal. R4 requires confirmation after a successful booking.                                                                  |
-| 2    | class    | `Administrator "0..*" -- "0..*" Room : manages >` and no explicit R2 note                    | Removed the Administrator–Room structural association and added an R2 note to `Booking`; `Room` also has an explicit `blocked: Boolean` state | The stories give administrators block/unblock goals but do not require a structural Administrator–Room association. R2 cannot be represented by multiplicity, and R3 requires an explicit blocked state. |
-| 3    | sequence | `existsOverlappingOrBlocked(...)` combined R2 and R3 into one availability check             | Separate `isRoomBlocked(...)` for R3 and `existsOverlappingBooking(...)` for R2                                                               | R2 and R3 are different rules, so the behaviour diagram should show the two checks separately and make their failure reasons visible.                                                                    |
+| Change                                                                                                 | Diagram          | Reason                                                                                                           |
+|--------------------------------------------------------------------------------------------------------|------------------|------------------------------------------------------------------------------------------------------------------|
+| Removed Generate Booking Confirmation as an included use case and renamed Book Study Room to Book Room | Use case diagram | Confirmation is an outcome, not a separate student goal; the use-case name should describe the goal              |
+| Removed Administrator–Room association, added R2 note, and changed Room state to blocked Boolean       | Class diagram    | The association was not justified by the requirements; R2 is a constraint and R3 requires explicit blocked state |
+| Split combined availability check into separate blocked-room and overlapping-booking checks            | Sequence diagram | R3 and R2 are different validation rules and should be shown separately                                          |
 ---
 
 ## 9. Checker output
 
-Paste the complete output of `python tests/check_models.py`, then explain **every FAIL you are
-keeping**. The same IDs go in `submission.yml` under `checker.kept_fails`. A FAIL you report and explain costs you nothing. One you hide costs the whole criterion.
-
 ```text
-<paste the full output>
+UC1  PASS  Student and Administrator declared
+UC2  PASS  named system boundary: "Smart Campus Study Room Booking System"
+UC3  PASS  all actors declared outside the boundary
+UC4  PASS  all scenario goals present (6 use cases)
+UC5  PASS  no actor is associated with a confirmation use case
+UC6  PASS  actor responsibilities match the scenario
+UC7  PASS  use cases are goals, not screens or components
+UC8  PASS  every include / extend / generalization carries a ' why: comment (or there are none)
+UC9  PASS  revised diagram differs from the AI's original
+CL1  PASS  Student, Room and Booking present
+CL2  PASS  Booking is associated with Student and with Room
+CL3  PASS  every association has multiplicities at both ends
+CL4  PASS  1 student / 1 room per booking, 0..* bookings per student and per room
+CL5  PASS  every inheritance / composition / aggregation carries a ' why: comment (or there are none)
+CL6  PASS  only domain concepts in the class diagram
+CL7  PASS  attributes needed by R1-R3 are present
+CL8  PASS  a note states R2 (no overlapping active bookings)
+SQ1  PASS  Student, BookingService and BookingRepository lifelines present
+SQ2  PASS  alt block with a guard on every branch (6 branches)
+SQ3  PASS  validation happens before creation
+SQ4  FAIL  a failure branch still creates/saves: createBooking(studentId, roomId, startTime, durationMinutes)
+SQ5  PASS  every message is labelled
+SQ6  PASS  R1 (time range) is visible - checked or stated as a precondition
+SQ7  PASS  R3 (blocked room) is visible
+FI1  PASS  the AI's original output is kept for every diagram
+FI2  PASS  a rendered image for every diagram
+LR1  PASS  §1 setup filled (tool and model recorded)
+LR2  PASS  5 prompts pasted in §2
+LR3  PASS  2 use-case findings in §3
+LR4  PASS  §4 relationships read both ways, 2 assumption(s) declared
+LR5  PASS  2 behaviour-diagram findings in §5
+LR6  PASS  3 critique issues with a verdict
+LR7  PASS  3 change-log rows covering all three diagrams
+CS1  PASS  6 approved stories
+CS2  PASS  §7 traces R1-R4 into the diagrams
+CS3  PASS  every use case traces to an approved story
+CS4  PASS  every lifeline is a domain class or an explained design component
+
+SUMMARY pass=36 fail=1 error=0
 ```
 
-**FAILs I am keeping, and why:** <one line per check ID, or "none">
+**FAILs I am keeping, and why:**
+
+- SQ4 — The checker reports `createBooking(...)` as being inside a failure branch, but in the sequence diagram it is inside the successful `else R2 no overlapping booking` branch, after R1, R3, and R2 validation. No booking is created on the R1, R3, or R2 failure branches. I keep this FAIL because it is a limitation of the shape-only checker parser, not a failure of the modeled booking flow.
 
 ---
 

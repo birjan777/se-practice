@@ -17,7 +17,7 @@ class Student {
   - studentId: String
   - name: String
   - email: String
-  + bookRoom(room: Room, startTime: DateTime, durationMinutes: Integer): Booking
+  + bookRoom(studentId: String, roomId: String, startTime: DateTime, durationMinutes: Integer): Booking
   + cancelBooking(booking: Booking): Boolean
   + viewAvailability(timeSlot: DateTime): List<Room>
 }
