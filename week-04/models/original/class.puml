@@ -1,0 +1,56 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+enum RoomStatus {
+  AVAILABLE
+  BLOCKED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+class Student {
+  - studentId: String
+  - name: String
+  - email: String
+  + bookRoom(room: Room, startTime: DateTime, durationMinutes: Integer): Booking
+  + cancelBooking(booking: Booking): Boolean
+  + viewAvailability(timeSlot: DateTime): List<Room>
+}
+
+class Administrator {
+  - adminId: String
+  - name: String
+  + blockRoom(room: Room): Boolean
+  + unblockRoom(room: Room): Boolean
+  + reviewUsage(): Report
+}
+
+class Room {
+  - roomId: String
+  - roomNumber: String
+  - status: RoomStatus
+  + isAvailable(startTime: DateTime, durationMinutes: Integer): Boolean
+  + setBlocked(blocked: Boolean): Void
+}
+
+class Booking {
+  - bookingId: String
+  - startTime: DateTime
+  - durationMinutes: Integer
+  - status: BookingStatus
+  - createdAt: DateTime
+  + isValidDuration(): Boolean
+  + isFutureStart(): Boolean
+  + cancel(): Void
+}
+
+' Relationships & Multiplicities
+Student "1" -- "0..*" Booking : creates / owns >
+Room "1" -- "0..*" Booking : reserved for <
+Administrator "0..*" -- "0..*" Room : manages >
+
+@enduml

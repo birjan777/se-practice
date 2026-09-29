@@ -1,0 +1,49 @@
+@startuml
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+actor "s: Student" as Student
+participant ": BookingService" as Service
+participant ": BookingRepository" as Repository
+
+autonumber
+
+Student -> Service : bookRoom(studentId, roomId, startTime, durationMinutes)
+activate Service
+
+' Validation Step: R1 Rule Check
+Service -> Service : validateBookingRules(startTime, durationMinutes)
+note right
+  **R1 Check:**
+  - startTime > currentTime
+  - 0 < durationMinutes <= 120
+end note
+
+alt #LightPink Validation Failed or Invalid Parameters (Rule R1 Violation)
+    Service --> Student : return Error ("Invalid time or duration")
+
+else #LightGreen Parameters Valid (Rule R1 Passed)
+
+    ' Checking availability against R2 & R3
+    Service -> Repository : existsOverlappingOrBlocked(roomId, startTime, durationMinutes)
+    activate Repository
+    Repository --> Service : isUnavailable: Boolean
+    deactivate Repository
+
+    alt #LightPink Room Unavailable (Rule R2 or R3 Violation)
+        Service --> Student : return Error ("Room is blocked or already booked for this slot")
+
+    else #LightGreen Room Available
+        ' Reservation Step & Confirmation (Rule R4)
+        Service -> Repository : createBooking(studentId, roomId, startTime, durationMinutes)
+        activate Repository
+        Repository --> Service : bookingInstance
+        deactivate Repository
+
+        Service --> Student : return BookingConfirmation (bookingId, details)
+    end
+end
+
+deactivate Service
+@enduml

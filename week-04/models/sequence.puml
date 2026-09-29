@@ -1,0 +1,60 @@
+@startuml
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+actor "s: Student" as Student
+participant ": BookingService" as Service
+participant ": BookingRepository" as Repository
+
+autonumber
+
+Student -> Service : bookRoom(studentId, roomId, startTime, durationMinutes)
+activate Service
+
+Service -> Service : validateBookingRules(startTime, durationMinutes)
+
+note right
+  R1:
+  startTime must be in the future.
+  0 < durationMinutes <= 120.
+end note
+
+alt R1 validation failed
+    Service --> Student : Error ("Invalid time or duration")
+
+else R1 validation passed
+
+    Service -> Repository : isRoomBlocked(roomId)
+    activate Repository
+    Repository --> Service : blocked: Boolean
+    deactivate Repository
+
+    alt R3 room is blocked
+        Service --> Student : Error ("Room is blocked")
+
+    else R3 room is not blocked
+
+        Service -> Repository : existsOverlappingBooking(roomId, startTime, durationMinutes)
+        activate Repository
+        Repository --> Service : overlapping: Boolean
+        deactivate Repository
+
+        alt R2 overlapping booking exists
+            Service --> Student : Error ("Room already booked for this slot")
+
+        else R2 no overlapping booking
+
+            Service -> Repository : createBooking(studentId, roomId, startTime, durationMinutes)
+            activate Repository
+            Repository --> Service : bookingInstance
+            deactivate Repository
+
+            Service --> Student : BookingConfirmation (bookingId, details)
+        end
+    end
+end
+
+deactivate Service
+
+@enduml

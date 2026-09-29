@@ -1,0 +1,82 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+enum RoomStatus {
+  AVAILABLE
+  BLOCKED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+class Student {
+  - studentId: String
+  - name: String
+  - email: String
+  + bookRoom(studentId: String, roomId: String, startTime: DateTime, durationMinutes: Integer): Booking
+  + cancelBooking(booking: Booking): Boolean
+  + viewAvailability(timeSlot: DateTime): List<Room>
+}
+
+class Administrator {
+  - adminId: String
+  - name: String
+  + blockRoom(room: Room): Boolean
+  + unblockRoom(room: Room): Boolean
+  + reviewUsage(): Report
+}
+
+class Room {
+  - roomId: String
+  - roomNumber: String
+  - blocked: Boolean
+}
+
+class Booking {
+  - bookingId: String
+  - startTime: DateTime
+  - durationMinutes: Integer
+  - status: BookingStatus
+  - createdAt: DateTime
+  + isValidDuration(): Boolean
+  + isFutureStart(): Boolean
+  + cancel(): Void
+}
+
+Student "1" -- "0..*" Booking : makes >
+Room "1" -- "0..*" Booking : contains >
+
+note right of Booking
+R1: Start must be in the future.
+Duration > 0 and <= 2 hours.
+
+R2: Active bookings for the
+same room cannot overlap.
+
+R4: A successful booking
+produces a confirmation.
+end note
+
+note right of Room
+R3: A blocked room cannot
+accept a new booking.
+end note
+
+note bottom of Room
+Assumption:
+Existing bookings remain when a room
+is blocked. Blocking prevents new bookings.
+end note
+
+note bottom of Booking
+Assumption:
+Touching bookings do not overlap.
+Example: 10:00-12:00 and 12:00-13:00
+are allowed.
+end note
+
+@enduml

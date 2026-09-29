@@ -1,0 +1,38 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle outline
+
+left to right direction
+
+actor "Student" as student
+actor "Administrator" as admin
+
+rectangle "Smart Campus Study Room Booking System" {
+
+  ' Student Use Cases
+  usecase "US-02: View Room Availability" as UC_ViewAvailability
+  usecase "US-01: Book Study Room" as UC_BookRoom
+  usecase "US-03: Cancel Booking" as UC_CancelBooking
+  usecase "Generate Booking Confirmation" as UC_Confirmation
+
+  ' Admin Use Cases
+  usecase "US-04: Block Room" as UC_BlockRoom
+  usecase "US-05: Unblock Room" as UC_UnblockRoom
+  usecase "US-06: Review Room Usage" as UC_ReviewUsage
+
+  ' Associations for Student
+  student -- UC_ViewAvailability
+  student -- UC_BookRoom
+  student -- UC_CancelBooking
+
+  ' Associations for Admin
+  admin -- UC_BlockRoom
+  admin -- UC_UnblockRoom
+  admin -- UC_ReviewUsage
+
+  ' Inclusion Relationship (Rule R4)
+  UC_BookRoom .> UC_Confirmation : <<include>>
+
+}
+@enduml
