@@ -29,7 +29,60 @@ grader find your answers by them. Add rows to any table; never remove its header
 **The assistant's plan, pasted unedited:**
 
 ```text
-(paste here)
+### Implementation Plan for `can_book`
+
+#### 1. Explicit Assumptions
+
+* **Time Scale & Types:** All time values (`start`, `end`, `now`) are integers representing minutes since midnight ($0$ to $1440$).
+* **Data Structures:** `existing` is a sequence (list or tuple) containing valid `(e_start, e_end)` integer tuples for active bookings. `blocked` is a boolean.
+* **Mutability:** The function must not modify input data structures (e.g., `existing`).
+
+---
+
+#### 2. Ordered Logic Checks
+
+1. **AC3 Check (Block State):**
+* If `blocked` is `True`, immediately return `False`.
+
+
+2. **AC1 Check (Valid Time Range & Future Booking):**
+* Check bounds: $0 \le \text{start} < \text{end} \le 1440$.
+* Check start time relative to current time: $\text{start} > \text{now}$.
+* If any of these fail, return `False`.
+
+
+3. **AC2 Check (Duration Limit):**
+* Check duration: $(\text{end} - \text{start}) \le 120$.
+* If exceeded, return `False`.
+
+
+4. **AC4 Check (Overlap Detection):**
+* Iterate through each `(e_start, e_end)` in `existing`.
+* Overlap exists if $\max(\text{start}, \text{e\_start}) < \min(\text{end}, \text{e\_end})$.
+* If an overlap is found, return `False`.
+
+
+5. **AC5 Check (Success):**
+* If all previous checks pass without returning, return `True`.
+
+
+
+---
+
+#### 3. Boundary Test Cases
+
+| Case ID | Scenario / Boundary | Inputs (`start`, `end`, `now`, `blocked`, `existing`) | Expected | Target Vulnerability |
+| --- | --- | --- | --- | --- |
+| **B1** | Immediate start after `now` | `start=601`, `end=660`, `now=600`, `False`, `[]` | `True` | Checks if strict inequality $\text{start} > \text{now}$ is enforced vs. $\ge$. |
+| **B2** | Same-minute booking | `start=600`, `end=660`, `now=600`, `False`, `[]` | `False` | Catching invalid `start == now` attempts. |
+| **B3** | Maximum allowed duration | `start=100`, `end=220`, `now=0`, `False`, `[]` | `True` | Boundary condition $(\text{end} - \text{start}) = 120$. |
+| **B4** | Exceeding duration by 1 min | `start=100`, `end=221`, `now=0`, `False`, `[]` | `False` | Over-duration handling ($121$ minutes). |
+| **B5** | End of day limit | `start=1320`, `end=1440`, `now=1200`, `False`, `[]` | `True` | Validating maximum possible boundary ($\text{end} = 1440$). |
+| **B6** | Out of bounds end time | `start=1330`, `end=1441`, `now=1200`, `False`, `[]` | `False` | Validating boundary upper limit ($\text{end} > 1440$). |
+| **B7** | Endpoint touching (Before) | New: `(500, 600)`, Existing: `[(600, 700)]` | `True` | Validating that touching endpoints ($\text{end} = \text{e\_start}$) do not count as overlap. |
+| **B8** | Endpoint touching (After) | New: `(700, 800)`, Existing: `[(600, 700)]` | `True` | Validating that touching endpoints ($\text{start} = \text{e\_end}$) do not count as overlap. |
+| **B9** | Partial overlap (1 min) | New: `(599, 660)`, Existing: `[(600, 700)]` | `False` | Off-by-one interval inclusion errors. |
+| **B10** | Existing interval inside | New: `(500, 700)`, Existing: `[(550, 650)]` | `False` | Enclosing interval check failures. |
 ```
 
 **What the plan invented or changed.** One row for every rule in the plan that is not in the
@@ -38,11 +91,23 @@ row saying which lines of the plan you checked against which AC.
 
 | # | What the plan said | What the contract or the AC says | What I did |
 | --- | --- | --- | --- |
-| 1 | | | |
+| 1 | The plan said that all time values, including `now`, are integers from 0 to 1440. | The contract says `now` is valid from 0 to 1439. AC1 allows the booking `end` to be 1440. | I did not add the 0–1440 rule for `now`; I followed the contract and AC1. |
+| 2 | The plan said that `existing` can be a list or tuple containing booking tuples. | The contract only specifies that `existing` contains valid `(start, end)` tuples. It does not add a list/tuple requirement for the container. | I did not add an extra container-type rule. |
+
+
 
 **Boundary cases the assistant suggested that I kept as tests:**
 
--
+- Start exactly one minute after `now` (`start > now`) — AC1.
+- Start exactly at `now` — AC1.
+- Exactly 120 minutes — AC2.
+- 121 minutes — AC2.
+- `end = 1440` — AC1.
+- `end = 1441` — AC1.
+- Touching at the end of an existing booking — AC4.
+- Touching at the start of an existing booking — AC4.
+- Partial overlap — AC4.
+- An existing booking inside the requested interval — AC4.
 
 ---
 
