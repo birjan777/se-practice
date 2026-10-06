@@ -64,6 +64,47 @@ class BookingTests(unittest.TestCase):
         result = can_book(600, 720, 540, False, [(630, 660)])
         self.assertIs(result, False)
 
+    # 13. Start before the beginning of the day is rejected
+    def test_start_before_day_is_rejected(self):
+        result = can_book(-1, 60, 0, False, [])
+        self.assertIs(result, False)
+
+    # 14. Requested booking completely inside existing booking is rejected
+    def test_request_inside_existing_booking_is_rejected(self):
+        result = can_book(630, 640, 540, False, [(600, 660)])
+        self.assertIs(result, False)
+
+    # 15. Existing bookings are not modified
+    def test_existing_bookings_are_unchanged(self):
+        existing = [(600, 660), (720, 780)]
+        original = existing.copy()
+
+        can_book(800, 860, 540, False, existing)
+
+        self.assertEqual(existing, original)
+
+    # 16. Booking ending at the same time as an existing booking is rejected
+    def test_same_interval_as_existing_booking_is_rejected(self):
+        result = can_book(600, 660, 540, False, [(600, 660)])
+        self.assertIs(result, False)
+
+    # 17. Existing bookings are unchanged when there is an overlap
+    def test_existing_bookings_unchanged_after_overlap_check(self):
+        existing = [(600, 660), (720, 780)]
+        original = existing.copy()
+
+        can_book(630, 650, 540, False, existing)
+
+        self.assertEqual(existing, original)
+
+    # 18. A booking must start after now even when it ends at 1440
+    def test_start_must_be_after_now_at_day_end(self):
+        result = can_book(1439, 1440, 1439, False, [])
+        self.assertIs(result, False)
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
