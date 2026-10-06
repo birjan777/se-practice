@@ -1,0 +1,44 @@
+schema: 1
+week: "05"
+
+student:
+  name: Khalenov Birzhan
+  student_id: 25B030042
+  github: birjan777
+
+assistant:
+  tool: Gemini
+  model: Gemini 3.6 Flash
+
+language:
+  name: python
+  path: A
+
+counts:
+  tests: 18
+  v1_changed: no
+  change_log_rows: 1
+
+checker:
+  pass: 29
+  fail: 3
+  error: 0
+  commit: 0e2fb4f
+
+  known_fails: [M2, M7, M10]
+
+assumptions:
+  non_integer_time: not-handled
+
+carried:
+  week04_touching: allowed
+
+review_findings:
+  - AC1: the booking start must be strictly after now
+  - AC4: touching endpoints are allowed and overlapping intervals must be rejected
+  - AC5: the function must return a real Boolean and must not modify existing bookings
+
+honesty:
+  v1_unedited: yes
+  can_explain_overlap_without_ai: yes
+  ai_usage_disclosed: yes
