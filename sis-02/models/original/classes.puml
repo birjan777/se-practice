@@ -1,0 +1,46 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Student {
+    - studentId: String
+    - name: String
+    + getStudentId(): String
+}
+
+class Course {
+    - courseCode: String
+    - title: String
+    + getCourseCode(): String
+    + getTitle(): String
+}
+
+class CourseOffering {
+    - semester: String
+    - capacity: Integer
+    - availablePlaces: Integer
+    + getCapacity(): Integer
+    + getAvailablePlaces(): Integer
+}
+
+class Enrollment {
+    - enrollmentDate: Date
+    + getEnrollmentDate(): Date
+}
+
+Course "1" -- "*" CourseOffering : schedules >
+CourseOffering "1" -- "*" Enrollment : contains >
+Student "1" -- "*" Enrollment : holds >
+
+note bottom of CourseOffering
+  **Capacity Constraint:**
+  CourseOffering.capacity must be a positive whole number ($capacity > 0$). 
+  Available places must be $<=$ capacity and $>=$ 0.
+end note
+
+note bottom of Enrollment
+  **Uniqueness Constraint:**
+  A student may have only one enrollment 
+  per CourseOffering (unique pair of Student and CourseOffering).
+end note
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Student {
+    - studentId: String {id}
+    - name: String
+    + getStudentId(): String
+}
+
+class Course {
+    - courseCode: String {id}
+    - title: String
+    + getCourseCode(): String
+    + getTitle(): String
+}
+
+class CourseOffering {
+    - semester: String
+    - capacity: Integer {capacity > 0}
+    - availablePlaces: Integer {0 <= availablePlaces <= capacity}
+    + getCapacity(): Integer
+    + getAvailablePlaces(): Integer
+}
+
+class Enrollment {
+    - enrollmentDate: Date
+    + getEnrollmentDate(): Date
+    {unique} student, courseOffering
+}
+
+Course "1" --> "*" CourseOffering : course / offerings >
+CourseOffering "1" --> "*" Enrollment : offering / enrollments >
+Student "1" --> "*" Enrollment : student / enrollments >
+
+@enduml

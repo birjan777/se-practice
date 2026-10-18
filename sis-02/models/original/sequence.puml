@@ -1,0 +1,35 @@
+@startuml
+autonumber
+actor Student
+participant "UI" as UI
+participant "RegistrationController" as Ctrl
+participant "CourseCatalog" as Catalog
+participant "CourseOffering" as Offering
+participant "Enrollment" as Enrollment
+
+Student -> UI: Browse catalog (semester)
+UI -> Catalog: Get offerings and availability (semester)
+Catalog --> UI: Return course codes, titles, offerings, & available places
+UI --> Student: Display course catalog
+
+Student -> UI: Request registration (student, offering)
+UI -> Ctrl: Process registration request
+
+Ctrl -> Offering: Recheck availability & duplicate enrollment status
+note over Ctrl, Offering: Final checks and enrollment creation are atomic
+
+alt already enrolled
+    Ctrl --> UI: Reject request ("already enrolled")
+    UI --> Student: Explain reason, enrollment count unchanged
+else course full
+    Ctrl --> UI: Reject request ("course full")
+    UI --> Student: Explain reason, enrollment count unchanged
+else
+    create Enrollment
+    Ctrl -> Enrollment: <<create>> new Enrollment(student, offering)
+    Ctrl -> Offering: Decrement available places
+    Ctrl --> UI: Return registration confirmation
+    UI --> Student: Display success confirmation
+end
+
+@enduml
