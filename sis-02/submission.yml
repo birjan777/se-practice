@@ -28,7 +28,7 @@ checker:                        # from your LAST run of python tests/check_sis.p
   pass: 44
   fail: 0
   error: 0
-  commit: 58bb0c7                       # git rev-parse --short HEAD, run right after that checker run
+  commit: bbcf5da            # git rev-parse --short HEAD, run right after that checker run
 
 counts:
   stories: 3
