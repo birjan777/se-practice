@@ -1,8 +1,13 @@
 # Week 07 — Lab report
 
 **Name:**
+Khalenov Birzhan
+
 **Group:**
+Monday 16:00-19:00
+
 **Date:**
+05.11.2026
 
 Fill in every section. **Do not delete, rename or renumber the headings.** The checker and the
 grader find your answers by them. You can add rows to any table, but never remove its header.
@@ -11,15 +16,15 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 ## 1. Setup
 
-| | |
-| --- | --- |
-| Project I continue (`week-06` = my Week 06 Bolt project, `starter` = the provided starter) | |
-| Bolt project link (or `not shared`, and why) | |
-| Assistant that generated the tests (tool) | |
-| Exact model (with its version, or `not displayed`) | |
-| Where I ran the tests (Bolt terminal / my computer / Codespace) | |
-| Vitest version (the `RUN  v…` line of a run) | |
-| Test command | |
+|                                                                                            |                                |
+|--------------------------------------------------------------------------------------------|--------------------------------|
+| Project I continue (`week-06` = my Week 06 Bolt project, `starter` = the provided starter) | starter                        |
+| Bolt project link (or `not shared`, and why)                                               | not shared — used starter      |
+| Assistant that generated the tests (tool)                                                  | Gemini                         |
+| Exact model (with its version, or `not displayed`)                                         | Gemini 3                       |
+| Where I ran the tests (Bolt terminal / my computer / Codespace)                            | my computer                    |
+| Vitest version (the `RUN  v…` line of a run)                                               | 3.2.7                          |
+| Test command                                                                               | npx vitest run booking.test.ts |
 
 ---
 
@@ -27,17 +32,21 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 **Before editing:** where did the booking decision live in the project you started from?
 
-| | |
-| --- | --- |
-| File and function (or "inside the page component") | |
-| Its inputs | |
-| What it returned | |
-| How the page used it | |
+|                                                    |                                                                                                                    |
+|----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| File and function (or "inside the page component") | Inside the page component, in App.tsx > check()                                                                    |
+| Its inputs                                         | Start and end times converted to minutes, current time in minutes, blocked flag, and the selected room’s bookings. |
+| What it returned                                   | A boolean: true for Available and false for Unavailable.                                                           |
+| How the page used it                               | check() stored the boolean in result, which the page displayed as Available or Unavailable.                        |
 
 **What I changed to extract `canBook`.** Say which file it now lives in, what you moved, and why
 the behaviour did not change. Also say which file of the page now calls it. 40 words or more.
 
 <!-- Write below this line -->
+
+I extracted the booking decision into app/src/booking.ts as the exported function canBook. I moved the checks for valid time boundaries, start time after now, maximum duration, blocked rooms, and overlap with existing bookings. I kept the same conditions and order from the starter, so the booking decision should behave the same as before extraction. The page in app/src/App.tsx converts the time inputs to minutes and calls canBook with those values and the selected room’s bookings. It still displays the returned boolean as Available or Unavailable.
+
+
 
 ---
 
@@ -72,7 +81,7 @@ five columns.
 
 ---
 
-## 4. Task 3 — the generation prompt and the first suite
+### 4. Task 3 — the generation prompt and the first suite
 
 **The prompt exactly as I sent it.** Use the deck's prompt with `[our test framework]` replaced by
 `Vitest`, followed by the case table from section 3:
@@ -106,7 +115,7 @@ Return the test file, run command, and AC mapping. Flag unclear requirements. We
 | X2   | 1380–1440; now = 540, blocked = false, bookings = []                           | true                   | AC1    | Конец ровно 1440 допустим по AC1; этот тест проверяет верхнюю границу суток.                           |
 
 ```
-## Second response after I clarified the function interface:
+#### Second response after I clarified the function interface:
 ```
 
 Please correct the test file to match the actual project and the supplied case table. The function is exported as `canBook` from `./booking`, takes `{ start, end, now, blocked, bookings }`, and returns a boolean directly.
@@ -123,7 +132,7 @@ AC6 is checked manually in the UI, not by this unit suite. Return the corrected 
 pasted unedited.** Its test file goes to `suites/first/` and is not pasted here:
 
 ```text
-### Run Command
+#### Run Command
 
 To execute the test suite using Vitest, run:
 
@@ -134,7 +143,7 @@ npx vitest run booking.test.ts
 
 ---
 
-### Test File (`booking.test.ts`)
+#### Test File (`booking.test.ts`)
 
 ```typescript
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -269,7 +278,7 @@ describe('Booking Function Test Suite (AC1–AC6)', () => {
 ```
 ---
 
-### AC Mapping
+#### AC Mapping
 
 | Acceptance Criteria (AC) | Mapped Test Cases                 | Description / Rule Verified                                                       |
 |--------------------------|-----------------------------------|-----------------------------------------------------------------------------------|
@@ -282,13 +291,13 @@ describe('Booking Function Test Suite (AC1–AC6)', () => {
 
 ---
 
-### Flagged Unclear Requirements
+#### Flagged Unclear Requirements
 
 1. **Acceptance Criteria 6 (AC6)**: The prompt specifies requirements **AC1–AC6**, but the test case table and specifications only detail AC1 through AC5. AC6 is undefined in the provided context.
 * *Recommendation*: Clarify whether AC6 refers to error messaging formats, return types (e.g., boolean vs object), or logging behavior so a specific assertion can be added.
 
 ```
-## Second response after I clarified the function interface:
+#### Second response after I clarified the function interface:
 ```
 ### Run Command
 
@@ -299,7 +308,7 @@ npx vitest run booking.test.ts
 
 ---
 
-### Test File (`booking.test.ts`)
+#### Test File (`booking.test.ts`)
 
 ```typescript
 import { describe, it, expect } from 'vitest';
@@ -413,35 +422,30 @@ describe('canBook function test suite (AC1–AC5)', () => {
   });
 });
 
-```
 
----
+#### AC Mapping
 
-### AC Mapping
+| Acceptance Criteria (AC) | Mapped Test Cases                 | Description / Rule Verified                                                       |
+|--------------------------|-----------------------------------|-----------------------------------------------------------------------------------|
+| **AC1**                  | T02, T03, T04, T05, X1, X2        | Time boundary validation (`now ≤ start < end ≤ 1440`).                            |
+| **AC2**                  | T06, T07                          | Maximum duration constraint (limit ≤ 120 minutes).                                |
+| **AC3**                  | T13                               | Room block status (`blocked = true` rejects bookings).                            |
+| **AC4**                  | T01, T08, T09, T10, T11, T12, T14 | Overlap checking (touching boundaries allowed, overlapping/identical disallowed). |
+| **AC5**                  | AC5, T01, T08                     | Immutability / returning true without mutating the input bookings array.          |
 
-| Acceptance Criteria (AC) | Mapped Test Cases | Description / Rule Verified |
-| --- | --- | --- |
-| **AC1** | T02, T03, T04, T05, X1, X2 | Time boundary validation (`now ≤ start < end ≤ 1440`). |
-| **AC2** | T06, T07 | Maximum duration constraint (limit ≤ 120 minutes). |
-| **AC3** | T13 | Room block status (`blocked = true` rejects bookings). |
-| **AC4** | T01, T08, T09, T10, T11, T12, T14 | Overlap checking (touching boundaries allowed, overlapping/identical disallowed). |
-| **AC5** | AC5, T01, T08 | Immutability / returning true without mutating the input bookings array. |
 
----
-
-### Unclear Requirements & Notes
+#### Unclear Requirements & Notes
 
 * **AC6**: As specified, AC6 is evaluated manually in the user interface (UI) rather than via this automated unit test suite. No unhandled ambiguity remains for the unit tests themselves.
+```
 
-
-
-The first suite was saved to `suites/first/` **before** I changed anything in it: yes / no
+The first suite was saved to `suites/first/` **before** I changed anything in it: yes 
 ```
 ```
 
 ---
 
-## 5. Task 4 — review of the first suite
+### 5. Task 4 — review of the first suite
 
 Review it **before** you run it. Look at the imports, the expected values, isolation, duplicates
 and skipped tests. Make one row per decision. At least **two** rows, and each one names the kind of
@@ -466,10 +470,10 @@ The **real** terminal output of the first run of the first suite, pasted unedite
 is not a run.
 
 ```text
-  
+
  RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-07/app
 
- ✓ src/booking.test.ts (17 tests) 2ms
+ ❯ src/booking.test.ts (17 tests | 1 failed) 5ms
    ✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
    ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
    ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
@@ -485,13 +489,37 @@ is not a run.
    ✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
    ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
    ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
-   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   × canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be allowed 3ms
+     → expected false to be true // Object.is equality
    ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
 
- Test Files  1 passed (1)
-      Tests  17 passed (17)
-   Start at  18:04:37
-   Duration  371ms (transform 69ms, setup 0ms, collect 63ms, tests 2ms, environment 0ms, prepare 74ms)
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be allowed
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:102:20
+    100|     const bookings: any[] = [];
+    101|     const result = canBook({ start: 0, end: 60, now: 0, blocked: false, bookings });
+    102|     expect(result).toBe(true);
+       |                    ^
+    103|   });
+    104| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  13:36:52
+   Duration  271ms (transform 31ms, setup 0ms, collect 24ms, tests 5ms, environment 0ms, prepare 53ms)
+
 
 ```
 
@@ -518,7 +546,7 @@ Use the actual failure output below. Separate test repairs from implementation f
 ## answer:
 ```text
 
-### 1. Test Suite Critique & Defect Analysis
+#### 1. Test Suite Critique & Defect Analysis
 
 #### A. Incorrect Expectations & Implementation Bugs (Discovered via Test Execution)
 
@@ -556,7 +584,7 @@ Use the actual failure output below. Separate test repairs from implementation f
 
 ---
 
-### 2. Proposed Test Improvements (Test Repairs)
+#### 2. Proposed Test Improvements (Test Repairs)
 
 To make the test suite more robust without compromising correct specifications:
 
@@ -565,7 +593,7 @@ To make the test suite more robust without compromising correct specifications:
 
 ---
 
-### 3. Separation of Concerns: Test Repairs vs. Implementation Fixes
+#### 3. Separation of Concerns: Test Repairs vs. Implementation Fixes
 
 * **Test Repair**: Keep test `X1` expecting `true` as mandated by AC1. The test correctly asserts the specification rule that starting at minute `0` when `now = 0` is valid.
 * **Implementation Fix**: Modify the underlying `canBook` function in `booking.ts` to replace strict comparison (`now < start`) with non-strict comparison (`now <= start`) so that `X1` passes correctly.
@@ -809,7 +837,34 @@ change and after restoring the correct code from section 7. Every test must pass
 is still open, leave its test failing and explain it in 9.1.
 
 ```text
-(paste here)
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-07/app
+
+ ✓ src/booking.test.ts (17 tests) 2ms
+   ✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
+   ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
+   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  18:51:17
+   Duration  225ms (transform 32ms, setup 0ms, collect 23ms, tests 2ms, environment 0ms, prepare 60ms)
+
+
 ```
 
 ---
@@ -820,20 +875,195 @@ You need a reviewed, passing suite first. Then introduce **one** defect at a tim
 module, leave the tests unchanged, run, record, and **restore** the code. A syntax or import
 error does not count as detection.
 
-| Trial | Intentional change | Detected / Survived | Failing test ID(s) | If it survived: why, and what you added |
-| --- | --- | --- | --- | --- |
-| M1 | Reject duration >= 120 instead of > 120 | Detected / Survived | | |
-| M2 | Treat touching endpoints as an overlap | Detected / Survived | | |
-| M3 | Remove the blocked-room rejection | Detected / Survived | | |
+| Trial | Intentional change                      | Detected / Survived | Failing test ID(s)   | If it survived: why, and what you added    |
+|-------|-----------------------------------------|---------------------|----------------------|--------------------------------------------|
+| M1    | Reject duration >= 120 instead of > 120 | Detected            | 	T06                 | 	—                                         |
+| M2    | Treat touching endpoints as an overlap  | Detected            | T01, T08             | —                                          |
+| M3    | Remove the blocked-room rejection       | Detected            | T13                  | —                                          |
 
 **The run of each mutant, pasted unedited.** Paste the `Tests` summary line and the failing test
 names at least:
 
 ```text
-(paste here)
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-07/app
+
+ ❯ src/booking.test.ts (17 tests | 1 failed) 5ms
+   ✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
+   ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+   × canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 3ms
+     → expected false to be true // Object.is equality
+   ✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
+   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:41:20
+     39|     const bookings = [{ start: 600, end: 660 }];
+     40|     const result = canBook({ start: 720, end: 840, now: DEFAULT_NOW, blocked: false, bookings });
+     41|     expect(result).toBe(true);
+       |                    ^
+     42|   });
+     43| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  18:39:53
+   Duration  233ms (transform 31ms, setup 0ms, collect 22ms, tests 5ms, environment 0ms, prepare 51ms)
+
+
+ npx vitest run booking.test.ts
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-07/app
+
+ ❯ src/booking.test.ts (17 tests | 2 failed) 6ms
+   × canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 4ms
+     → expected false to be true // Object.is equality
+   ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+   × canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+     → expected false to be true // Object.is equality
+   ✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
+   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:10:20
+      8|     const bookings = [{ start: 600, end: 660 }];
+      9|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+     10|     expect(result).toBe(true);
+       |                    ^
+     11|   });
+     12| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:53:20
+     51|     const bookings = [{ start: 600, end: 660 }];
+     52|     const result = canBook({ start: 570, end: 600, now: DEFAULT_NOW, blocked: false, bookings });
+     53|     expect(result).toBe(true);
+       |                    ^
+     54|   });
+     55| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 15 passed (17)
+   Start at  18:44:54
+   Duration  224ms (transform 26ms, setup 0ms, collect 20ms, tests 6ms, environment 0ms, prepare 55ms)
+
+
+
+npx vitest run booking.test.ts
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-07/app
+
+ ❯ src/booking.test.ts (17 tests | 1 failed) 7ms
+   ✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
+   ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+   × canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 5ms
+     → expected true to be false // Object.is equality
+   ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
+   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/booking.test.ts:83:20
+     81|     const bookings = [{ start: 600, end: 660 }];
+     82|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: true, bookings });
+     83|     expect(result).toBe(false);
+       |                    ^
+     84|   });
+     85| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  18:48:39
+   Duration  375ms (transform 40ms, setup 0ms, collect 41ms, tests 7ms, environment 0ms, prepare 55ms)
+
+
 ```
 
-All three changes reverted, and the full suite run again (section 6.3): yes / no
+All three changes reverted, and the full suite run again (section 6.3): yes 
 
 ---
 
@@ -843,13 +1073,13 @@ Use `now = 09:00` and an existing `10:00–11:00` booking. Do them in the page i
 screenshot of each as `evidence/ui-1.png` … `evidence/ui-5.png`. Take **ui-4 at phone width**
 (about 375 px, portrait).
 
-| # | Action | Expected observation | AC | What I observed | Pass / Fail / Not testable |
-| --- | --- | --- | --- | --- | --- |
-| U1 | Check 11:00–12:00, unblocked | Available, with the fixed sample booking | AC5 | | Pass / Fail / Not testable |
-| U2 | Enable blocked, then check again | Unavailable replaces the earlier result | AC3, AC5 | | Pass / Fail / Not testable |
-| U3 | Clear a required input and submit | Understandable validation feedback | AC6 | | Pass / Fail / Not testable |
-| U4 | Use a narrow (phone) width | Controls and result remain usable | AC6 | | Pass / Fail / Not testable |
-| U5 | Repeat the checks on the same data | Existing bookings remain unchanged | AC5 | | Pass / Fail / Not testable |
+| #    | Action                             | Expected observation                     | AC       | What I observed                                                                                          | Pass / Fail / Not testable |
+|------|------------------------------------|------------------------------------------|----------|----------------------------------------------------------------------------------------------------------|----------------------------| 
+| U1   | Check 11:00–12:00, unblocked       | Available, with the fixed sample booking | AC5      | При 09:00, 11:00–12:00 и выключенной блокировке показано Available; бронь 10:00–11:00 осталась в списке. | Pass                       |
+| U2   | Enable blocked, then check again   | Unavailable replaces the earlier result  | AC3, AC5 | При включённом Room blocked результат показан как Unavailable; существующая бронь 10:00–11:00 видна.     | Pass                       |
+| U3   | Clear a required input and submit  | Understandable validation feedback       | AC6      | 	После очистки обязательного поля показано сообщение: “Fill in the current time, the start and the end.” | Pass                       |
+| U4   | Use a narrow (phone) width         | Controls and result remain usable        | AC6      | При ширине около 375 px страница отображается в портретном виде; поля расположены столбцом, бронь видна. | Pass                       |
+| U5   | Repeat the checks on the same data | Existing bookings remain unchanged       | AC5      | 	После повторной проверки показано Available; существующая бронь по-прежнему 10:00–11:00.                | Pass                       |
 
 ---
 
@@ -859,19 +1089,19 @@ screenshot of each as `evidence/ui-1.png` … `evidence/ui-5.png`. Take **ui-4 a
 
 Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run is clean.
 
-| Check | Why it stays |
-| --- | --- |
-| | |
+| Check | Why it stays                     |
+|-------|----------------------------------|
+| none  | No FAIL or ERROR checks remain.  |
 
 ### 9.2 Original and improved suites
 
-| Measure | First suite | Improved suite |
-| --- | --- | --- |
-| Executed / passed / failed | | |
-| Requirements with meaningful tests (AC IDs and gaps) | | |
-| Selected mutants detected | | |
-| Accepted / revised / rejected tests | | |
-| Remaining limitations | | |
+| Measure                                              | First suite                                                                                                                    | Improved suite                                                                             |
+|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| Executed / passed / failed                           | 17 / 16 / 1 (X1 expectation was incorrect)                                                                                     | 17 / 17 / 0                                                                                |
+| Requirements with meaningful tests (AC IDs and gaps) | AC1–AC5; AC6 is manual UI, not unit-tested                                                                                     | AC1–AC5; AC6 checked manually in §8                                                        |
+| Selected mutants detected                            | Not tested against mutants                                                                                                     | 	M1: T06; M2: T01 and T08; M3: T13                                                         |
+| Accepted / revised / rejected tests                  | Accepted exact-decision cases; revised X1 after checking it against AC1; rejected AI’s suggestion to change the implementation | Kept required cases, corrected X1 to false, and used fixed numeric now with fresh fixtures |
+| Remaining limitations                                | First run exposed the incorrect X1 expectation; UI behavior is outside this unit suite                                         | Unit tests do not prove all possible inputs or replace manual UI checks                    |
 
 ### 9.3 What no AC decides
 
@@ -879,7 +1109,8 @@ Call your function with `bookings = [{ start: 700, end: 650 }]` (a reversed exis
 and a request of 660–720. What does it return? Does any AC say what it should return? (This is
 the value you declare in `submission.yml` under `assumptions.invalid_existing_booking`.)
 
--
+- canBook returns true for the 660–720 request with bookings = [{ start: 700, end: 650 }]. No acceptance criterion defines how an invalid existing booking should be handled.
+
 
 ---
 
@@ -895,3 +1126,5 @@ the value you declare in `submission.yml` under `assumptions.invalid_existing_bo
      pass, M1 would have become the real behaviour." -->
 
 <!-- Write your conclusion below this line -->
+
+In the first suite, X1 expected true when the requested start time equaled now. I checked that expectation against AC1 and T02, which require the start time to be strictly later than the current time, so I corrected the test to expect false without changing canBook. The final run passed all 17 tests. The mutant checks gave additional evidence: T06 detected the incorrect 120-minute limit, T01 and T08 detected treating touching intervals as overlaps, and T13 detected removing the blocked-room check. My manual UI checks covered the visible Available and Unavailable results, validation feedback, narrow-screen layout, and whether existing booking data remained visible. A green run shows that the committed suite passes for its listed inputs and assertions; it does not prove correctness for every possible input or replace checking the page in a browser. One limitation remains: the acceptance criteria do not define how the function should handle an invalid existing booking, such as a reversed interval, so that behavior is still an explicit assumption.
