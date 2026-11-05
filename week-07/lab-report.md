@@ -47,25 +47,25 @@ Default fixture: `now = 540`, `blocked = false`, `bookings = [{ start: 600, end:
 for every test. **The Expected column comes from AC1–AC4, never from the code.** Write the
 **reason** for each expected result **before** you send the generation prompt.
 
-| ID | Candidate / changed input | Expected | AC | Reason (in your words) |
-| --- | --- | --- | --- | --- |
-| T01 | 660–720 (touching after) | true | AC4 | |
-| T02 | 540–570 (starts now) | false | AC1 | |
-| T03 | 720–720 (zero duration) | false | AC1 | |
-| T04 | 750–720 (reversed) | false | AC1 | |
-| T05 | 1380–1441 (past day end) | false | AC1 | |
-| T06 | 720–840 (120 minutes) | true | AC2 | |
-| T07 | 720–841 (121 minutes) | false | AC2 | |
-| T08 | 570–600 (touching before) | true | AC4 | |
-| T09 | 630–690 (partial overlap) | false | AC4 | |
-| T10 | 570–690 (contains booking) | false | AC4 | |
-| T11 | 615–645 (inside booking) | false | AC4 | |
-| T12 | 600–660 (identical interval) | false | AC4 | |
-| T13 | 660–720, blocked = true | false | AC3 | |
-| T14 | 630–690, bookings = [] | true | AC4 | |
-| AC5 | an Available request — the bookings after the call equal the bookings before | true, data unchanged | AC5 | |
-| X1 | | | | |
-| X2 | | | | |
+| ID   | Candidate / changed input                                                      | Expected               | AC     | Reason (in your words)                                                                                 |
+|------|--------------------------------------------------------------------------------|------------------------|--------|--------------------------------------------------------------------------------------------------------|
+| T01  | 660–720 (touching after)                                                       | true                   | AC4    | 	Запрос начинается ровно в 11:00, когда заканчивается существующая бронь; касание границ разрешено.    |
+| T02  | 540–570 (starts now)                                                           | false                  | AC1    | 	Запрос начинается в 09:00 — ровно в now; AC1 требует, чтобы начало было позже текущего времени.       |
+| T03  | 720–720 (zero duration)                                                        | false                  | AC1    | Начало и конец равны, поэтому условие start < end не выполняется.                                      |
+| T04  | 750–720 (reversed)                                                             | false                  | AC1    | Конец 720 раньше начала 750, значит интервал задан в обратном порядке.                                 |
+| T05  | 1380–1441 (past day end)                                                       | false                  | AC1    | 	Конец 1441 превышает предел суток 1440.                                                               |
+| T06  | 720–840 (120 minutes)                                                          | true                   | AC2    | 	Длительность ровно 120 минут; AC2 запрещает только длительность больше 120 минут.                     |
+| T07  | 720–841 (121 minutes)                                                          | false                  | AC2    | 	Длительность 121 минута, то есть больше лимита AC2.                                                   |
+| T08  | 570–600 (touching before)                                                      | true                   | AC4    | Запрос заканчивается ровно в 10:00, когда начинается бронь; касание границ разрешено.                  |
+| T09  | 630–690 (partial overlap)                                                      | false                  | AC4    | Интервал 630–690 пересекает бронь 600–660 на участке 630–660.                                          |
+| T10  | 570–690 (contains booking)                                                     | false                  | AC4    | Запрос 570–690 охватывает существующую бронь целиком.                                                  |
+| T11  | 615–645 (inside booking)                                                       | false                  | AC4    | Запрос 615–645 целиком находится внутри существующей брони.                                            |
+| T12  | 600–660 (identical interval)                                                   | false                  | AC4    | 	Запрошен тот же интервал 600–660, который уже забронирован.                                           |
+| T13  | 660–720, blocked = true                                                        | false                  | AC3    | 	Комната заблокирована, поэтому AC3 требует отказать в бронировании.                                   |
+| T14  | 630–690, bookings = []                                                         | true                   | AC4    | Существующих бронирований нет, значит запрос не пересекается с ними.                                   |
+| AC5  | an Available request — the bookings after the call equal the bookings before   | true, data unchanged   | AC5    | 	Запрос доступен; функция должна вернуть true и оставить массив бронирований неизменным.               |
+| X1   | 0–60; now = 0, blocked = false, bookings = []                                  | true                   | AC1    | Начало ровно в 00:00 допустимо, так как 0 ≤ start < end; конец 60 также находится в пределах суток.    |
+| X2   | 1380–1440; now = 540, blocked = false, bookings = []                           | true                   | AC1    | Конец ровно 1440 допустим по AC1; этот тест проверяет верхнюю границу суток.                           |
 
 X1 and X2 are **your own two cases**: a boundary or a state that T01–T14 do not reach. Fill all
 five columns.
