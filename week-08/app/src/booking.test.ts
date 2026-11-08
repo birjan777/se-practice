@@ -108,4 +108,38 @@ describe('canBook function test suite (AC1–AC5)', () => {
     const result = canBook({ start: 1380, end: 1440, now: 540, blocked: false, bookings });
     expect(result).toBe(true);
   });
+
+  it("BUG-A: allows a request touching bookings at both ends", () => {
+    const bookings = [
+      { start: 540, end: 600 },
+      { start: 660, end: 720 },
+    ];
+
+    const result = canBook({
+      start: 600,
+      end: 660,
+      now: DEFAULT_NOW,
+      blocked: false,
+      bookings,
+    });
+
+    expect(result).toBe(true);
+  });
+
+  it("BUG-B: leaves bookings unchanged for an available request", () => {
+    const bookings = [{ start: 600, end: 660 }];
+    const before = [...bookings];
+
+    const result = canBook({
+      start: 720,
+      end: 780,
+      now: DEFAULT_NOW,
+      blocked: false,
+      bookings,
+    });
+
+    expect(result).toBe(true);
+    expect(bookings).toEqual(before);
+  });
+
 });

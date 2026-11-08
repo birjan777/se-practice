@@ -165,7 +165,139 @@ Run them **on the buggy code**. Both must fail here. That is the evidence that e
 its bug.
 
 ```text
-(paste here)
+RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ❯ src/booking.test.ts (19 tests | 5 failed) 7ms
+× canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 4ms
+→ expected false to be true // Object.is equality
+✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+× canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+→ expected false to be true // Object.is equality
+✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+× canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 1ms
+→ expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+× canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends 0ms
+→ expected false to be true // Object.is equality
+× canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request 0ms
+→ expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+ ❯ src/booking.test.ts:10:20
+8|     const bookings = [{ start: 600, end: 660 }];
+9|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+10|     expect(result).toBe(true);
+|                    ^
+11|   });
+12| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+ ❯ src/booking.test.ts:53:20
+51|     const bookings = [{ start: 600, end: 660 }];
+52|     const result = canBook({ start: 570, end: 600, now: DEFAULT_NOW, blocked: false, bookings });
+53|     expect(result).toBe(true);
+|                    ^
+54|   });
+55| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged
+AssertionError: expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+- Expected
+- Received
+  [
+  {
+  "end": 860,
+  "start": 800,
+  
+  },
+- {
+- "end": 720,
+- "start": 660,
+- },
+  ]
+ ❯ src/booking.test.ts:97:22
+95|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+96|     expect(result).toBe(true);
+97|     expect(bookings).toEqual(initialBookings);
+|                      ^
+98|   });
+99| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+ ❯ src/booking.test.ts:126:20
+124|     });
+125|
+126|     expect(result).toBe(true);
+|                    ^
+127|   });
+128| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request
+AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+- Expected
+- Received
+  [
+  {
+  "end": 660,
+  "start": 600,
+  
+  },
+- {
+- "end": 780,
+- "start": 720,
+- },
+  ]
+ ❯ src/booking.test.ts:142:22
+140|
+141|     expect(result).toBe(true);
+142|     expect(bookings).toEqual(before);
+|                      ^
+143|   });
+144| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+ Test Files  1 failed (1)
+Tests  5 failed | 14 passed (19)
+Start at  19:51:02
+Duration  306ms (transform 31ms, setup 0ms, collect 24ms, tests 7ms, environment 0ms, prepare 48ms)
+
 ```
 
 ---
