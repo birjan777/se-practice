@@ -14,14 +14,14 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 ## 1. Setup
 
-|                                                                                             |      |
-|---------------------------------------------------------------------------------------------|------|
-| Assistant I debugged with (tool)                                                            |      |
-| Exact model (with its version, or `not displayed`)                                          |      |
-| Where the skill was installed (ChatGPT / Claude web / Claude Code / prompt-only simulation) |      |
-| Where I ran the tests (Bolt terminal / my computer / Codespace)                             |      |
-| Vitest version (the `RUN  v…` line of a run)                                                |      |
-| Language of my booking module (`ts` or `js`) — the file I copied from `buggy/`              |      |
+|                                                                                             |                          |
+|---------------------------------------------------------------------------------------------|--------------------------|
+| Assistant I debugged with (tool)                                                            | not displayed            |
+| Exact model (with its version, or `not displayed`)                                          | not displayed            |
+| Where the skill was installed (ChatGPT / Claude web / Claude Code / prompt-only simulation) | prompt-only simulation   |
+| Where I ran the tests (Bolt terminal / my computer / Codespace)                             | my computer              |
+| Vitest version (the `RUN  v…` line of a run)                                                | Vitest 3.2.7             |
+| Language of my booking module (`ts` or `js`) — the file I copied from `buggy/`              | 3.2.7                    |
 
 ---
 
