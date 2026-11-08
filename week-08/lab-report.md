@@ -453,20 +453,7 @@ This addresses the reported failure and guards against the side effect. The prov
 Only the question changes, to the deck's skill question:
 
 ```text
----
-name: bug-detector
-description: Diagnose bugs in existing code using acceptance criteria and failing tests. Use when reviewing the Smart Campus booking application.
----
-# Bug Detector
-
-## Procedure
-1. Read acceptance criteria, code, and observed failure.
-2. Reproduce with the smallest deterministic input.
-3. Identify the likely root cause and relevant lines.
-4. Separate confirmed defects from hypotheses.
-5. Suggest a minimal fix, but do not edit code yet.
-6. Propose a regression test and expected result.
-7. Output: defect | evidence | root cause | fix | test.Use the bug-detector skill to diagnose the failed room-booking test.
+Use the bug-detector skill to diagnose the failed room-booking test.
 
 Scenario: Smart Campus room availability. A student checks whether a room is available for a requested time.
 
@@ -512,6 +499,7 @@ if (start <= b.end && end >= b.start) return false;
 bookings.push({ start, end });
 return true;
 }
+
 ```
 
 **The assistant's answer, pasted unedited:**
@@ -796,13 +784,14 @@ index 4006661..7dc1b4d 100644
 Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run is clean.
 
 | Check | Why it stays |
-| --- | --- |
-| | |
+|-------|--------------|
+|       | none         |
 
 ### 9.2 One limitation of AI-assisted debugging
 
 <!-- Use something that actually happened in sections 5-8. 20 words or more. -->
--
+- Both assistants identified the two defects, but their proposed regression tests needed review: the no-skill answer used a request starting exactly at now, which T02 rejects, while the skill answer raised an ambiguity already settled by T02. The assistant could suggest a diagnosis, but it could not replace checking the code and the existing tests.
+
 
 ---
 
@@ -817,3 +806,5 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
      visible after the BUG-A patch: the AC5 test had been failing for the wrong reason." -->
 
 <!-- Write your conclusion below this line -->
+
+The skill helped organize the diagnosis, but the comparison does not show that it made every recommendation more reliable. In the “Reproducible test” row, both answers found BUG-A and BUG-B, but the no-skill answer’s second request started at `now`, which T02 rejects, while the skill answer raised an ambiguity about `start === now` that T02 already resolves. The two regression tests failed on the buggy function and passed after the separate minimal fixes; the final suite had 19 passing tests, supporting endpoint handling and non-mutation for the tested inputs. Those results do not establish correctness for every possible interval or prove AC6’s desktop and mobile feedback, because the suite tests `canBook`, not the UI.
