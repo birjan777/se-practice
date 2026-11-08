@@ -355,14 +355,95 @@ the same input you will use in section 6 (AC1–AC6, the failing test output, th
 `canBook`):
 
 ```text
-(paste here)
+Find the root cause of the failed room-booking test. Propose minimal patch and regression test. Do not edit code.
+
+Scenario: Smart Campus room availability. A student checks whether a room is available for a requested time.
+
+Acceptance criteria:
+AC1: Reject start ≥ end and requests in the past.
+AC2: Enforce the maximum allowed duration of 120 minutes.
+AC3: Reject a blocked room.
+AC4: Reject overlaps; allow bookings that only touch at endpoints.
+AC5: Return Available / Unavailable without changing booking data.
+AC6: Preserve clear UI feedback on desktop and mobile.
+
+Failing test output from §2.2:
+FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+❯ src/booking.test.ts:10:20
+8|     const bookings = [{ start: 600, end: 660 }];
+9|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+10|     expect(result).toBe(true);
+|                    ^
+11|   });
+12|
+
+Provided canBook code:
+export function canBook({ start, end, now, blocked, bookings }: {
+start: number;
+end: number;
+now: number;
+blocked: boolean;
+bookings: { start: number; end: number }[];
+}): boolean {
+if (!(0 <= start && start < end && end <= 1440)) return false;
+if (!(start > now)) return false;
+if (end - start > 120) return false;
+if (blocked) return false;
+for (const b of bookings) {
+if (start <= b.end && end >= b.start) return false;
+}
+// keep the room's list current with the slot that was just found free
+bookings.push({ start, end });
+return true;
+}
+
 ```
 
 **The assistant's answer, pasted unedited:**
 
 ```text
-(paste here)
+The failing test hits the overlap check: `start <= b.end && end >= b.start` treats a shared endpoint as an overlap, so `660–720` is rejected after `600–660`.
+
+There’s also a separate AC5 issue: `bookings.push(...)` changes booking data during an availability check. A successful check can then affect later checks.
+
+Minimal patch:
+
+```ts
+for (const b of bookings) {
+  if (start < b.end && end > b.start) return false;
+}
+return true;
 ```
+
+The strict comparisons allow bookings that touch at either endpoint while still rejecting actual overlaps. Removing the `push` keeps the check read-only.
+
+Add a regression test that checks both endpoint directions and verifies the list stays unchanged:
+
+```ts
+it("allows bookings that touch at endpoints without changing bookings", () => {
+  const bookings = [{ start: 600, end: 660 }];
+  const original = structuredClone(bookings);
+
+  expect(canBook({
+    start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings,
+  })).toBe(true);
+
+  expect(canBook({
+    start: 540, end: 600, now: DEFAULT_NOW, blocked: false, bookings,
+  })).toBe(true);
+
+  expect(bookings).toEqual(original);
+});
+```
+
+This addresses the reported failure and guards against the side effect. The provided function doesn’t cover AC6’s desktop and mobile UI feedback.
+
+
 
 ---
 
@@ -372,16 +453,97 @@ the same input you will use in section 6 (AC1–AC6, the failing test output, th
 Only the question changes, to the deck's skill question:
 
 ```text
-(paste here)
+---
+name: bug-detector
+description: Diagnose bugs in existing code using acceptance criteria and failing tests. Use when reviewing the Smart Campus booking application.
+---
+# Bug Detector
+
+## Procedure
+1. Read acceptance criteria, code, and observed failure.
+2. Reproduce with the smallest deterministic input.
+3. Identify the likely root cause and relevant lines.
+4. Separate confirmed defects from hypotheses.
+5. Suggest a minimal fix, but do not edit code yet.
+6. Propose a regression test and expected result.
+7. Output: defect | evidence | root cause | fix | test.Use the bug-detector skill to diagnose the failed room-booking test.
+
+Scenario: Smart Campus room availability. A student checks whether a room is available for a requested time.
+
+Acceptance criteria:
+AC1: Reject start ≥ end and requests in the past.
+AC2: Enforce the maximum allowed duration of 120 minutes.
+AC3: Reject a blocked room.
+AC4: Reject overlaps; allow bookings that only touch at endpoints.
+AC5: Return Available / Unavailable without changing booking data.
+AC6: Preserve clear UI feedback on desktop and mobile.
+
+Failing test output from §2.2:
+FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+❯ src/booking.test.ts:10:20
+8|     const bookings = [{ start: 600, end: 660 }];
+9|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+10|     expect(result).toBe(true);
+|                    ^
+11|   });
+12|
+
+Provided canBook code:
+export function canBook({ start, end, now, blocked, bookings }: {
+start: number;
+end: number;
+now: number;
+blocked: boolean;
+bookings: { start: number; end: number }[];
+}): boolean {
+if (!(0 <= start && start < end && end <= 1440)) return false;
+if (!(start > now)) return false;
+if (end - start > 120) return false;
+if (blocked) return false;
+for (const b of bookings) {
+if (start <= b.end && end >= b.start) return false;
+}
+// keep the room's list current with the slot that was just found free
+bookings.push({ start, end });
+return true;
+}
 ```
 
 **The assistant's answer, pasted unedited:**
 
 ```text
-(paste here)
+### Reproduction
+
+Using the smallest endpoint-touching input — existing booking `[1, 2]`, request `[2, 3]`, `now: 0`, room unblocked — the function returns `false`. AC4 expects `true`.
+
+### Confirmed defects
+
+1. **AC4: endpoint-touching bookings are rejected.**  
+   **Evidence:** In T01, the existing booking ends at `660` and the request starts at `660`; the function returns `false`.  
+   **Root cause:** `start <= b.end && end >= b.start` counts equal endpoints as overlap.  
+   **Fix:** Use `start < b.end && end > b.start` to detect overlaps.  
+   **Regression test:** With booking `[1, 2]` and request `[2, 3]`, expect `true`. Also test a request that actually overlaps a booking and expect `false`.
+
+2. **AC5: a successful availability check changes booking data.**  
+   **Evidence:** The function calls `bookings.push({ start, end })` before returning `true`.  
+   **Root cause:** Availability checking also mutates the booking list.  
+   **Fix:** Remove the `push`; keep this function read-only.  
+   **Regression test:** Check a free slot with an empty `bookings` array; expect `true` and expect the array to remain empty.
+
+### Interpretation-dependent edge
+
+**AC1 at `start === now`:** The function rejects this because it requires `start > now`. AC1 says to reject requests *in the past*, which could mean equality is allowed. If that is the intended meaning, add a test for `start === now` expecting availability when the other conditions pass. If bookings must always start strictly in the future, make that requirement explicit.
+
+AC2 and AC3 are handled by the duration and blocked-room checks. AC6 can’t be assessed from the provided function. No code was changed.
+
 ```
 
-Did the environment show that the skill was invoked? yes / no / not shown
+Did the environment show that the skill was invoked? not shown
 
 ---
 
@@ -390,17 +552,17 @@ Did the environment show that the skill was invoked? yes / no / not shown
 Do not assume the skill did better. Judge both answers against the code and against what your
 tests showed. Write a short verdict in each cell, and give a reason where they differ.
 
-| Criterion | No skill | With skill |
-| --- | --- | --- |
-| Correct root cause | | |
-| Reproducible test | | |
-| Minimal proposed patch | | |
-| Unsupported claims | | |
-| Clarity of explanation | | |
+| Criterion              | No skill                                                                                                                                                 | With skill                                                                                                                              |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| Correct root cause     | 	Correctly identifies both defects: endpoint contact is treated as overlap, and bookings.push mutates the list.                                          | Correctly identifies both defects and connects them to the relevant code.                                                               |
+| Reproducible test      | 	Flawed: the second proposed request starts at now (540), which T02 says must be rejected. The test also does not independently prove BUG-B.             | Gives deterministic examples for endpoint contact and a free request with an unchanged list; these can test BUG-A and BUG-B separately. |
+| Minimal proposed patch | The strict comparisons and removing push are minimal fixes, but the answer presents both together rather than as separate fixes.                         | Proposes a minimal change for each bug: strict overlap comparisons and removal of push.                                                 |
+| Unsupported claims     | Saying its test “guards against the side effect” is not supported: the second request can fail because it starts at now. Its AC6 limitation is accurate. | The suggested ambiguity about start === now is unsupported: T02 in the actual suite expects a request starting at now to be rejected.   |
+| Clarity of explanation | The diagnosis is clear, but the proposed test mixes the bugs and includes an invalid case.                                                               | Clearly separates evidence, cause, fix, and test; the AC1 caveat adds unnecessary confusion.                                            |
 
 **Which bugs did each answer find?** (BUG-A, BUG-B, both, neither)
 
--
+- Both answers found BUG-A and BUG-B.
 
 ---
 
@@ -414,7 +576,133 @@ Rerun the test that was failing, then the full suite.
 The change as a diff (`git diff`, or the old and the new line), then the real run:
 
 ```text
-(paste here)
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ✓ src/booking.test.ts (19 tests | 18 skipped) 2ms
+↓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+↓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected
+↓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected
+↓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected
+↓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected
+↓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed
+↓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected
+↓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed
+↓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected
+↓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected
+↓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected
+↓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected
+↓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected
+↓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed
+↓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged
+↓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected
+↓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed
+✓ canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends 1ms
+↓ canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request
+
+ Test Files  1 passed (1)
+Tests  1 passed | 18 skipped (19)
+Start at  20:56:39
+Duration  443ms (transform 103ms, setup 0ms, collect 101ms, tests 2ms, environment 0ms, prepare 150ms)
+
+khalenovbirzhan@MacBook-Air-Khalenov app % npx vitest run
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ❯ src/booking.test.ts (19 tests | 2 failed) 9ms
+✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
+✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+× canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 5ms
+→ expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+✓ canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends 0ms
+× canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request 1ms
+→ expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged
+AssertionError: expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+- Expected
+- Received
+  [
+  {
+  "end": 860,
+  "start": 800,
+  
+  },
+- {
+- "end": 720,
+- "start": 660,
+- },
+  ]
+ ❯ src/booking.test.ts:97:22
+95|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+96|     expect(result).toBe(true);
+97|     expect(bookings).toEqual(initialBookings);
+|                      ^
+98|   });
+99| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request
+AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+- Expected
+- Received
+  [
+  {
+  "end": 660,
+  "start": 600,
+  
+  },
+- {
+- "end": 780,
+- "start": 720,
+- },
+  ]
+ ❯ src/booking.test.ts:142:22
+140|
+141|     expect(result).toBe(true);
+142|     expect(bookings).toEqual(before);
+|                      ^
+143|   });
+144| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+Tests  2 failed | 17 passed (19)
+Start at  20:56:44
+Duration  295ms (transform 26ms, setup 0ms, collect 27ms, tests 9ms, environment 0ms, prepare 39ms)
+
+
+diff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts
+index 843cd99..4006661 100644
+--- a/week-08/app/src/booking.ts
++++ b/week-08/app/src/booking.ts
+@@ -20,7 +20,7 @@ export function canBook({ start, end, now, blocked, bookings }: {
+   if (end - start > 120) return false;
+   if (blocked) return false;
+   for (const b of bookings) {
+-    if (start <= b.end && end >= b.start) return false;
++    if (start < b.end && end > b.start) return false;
+   }
+   // keep the room's list current with the slot that was just found free
+   bookings.push({ start, end });
+   
 ```
 
 ### 8.2 The BUG-B patch and the final run
