@@ -710,7 +710,81 @@ index 843cd99..4006661 100644
 The change as a diff, then the real output of the **full** suite. Every test must pass.
 
 ```text
-(paste here)
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ✓ src/booking.test.ts (19 tests | 18 skipped) 1ms
+   ↓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+   ↓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed
+   ↓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed
+   ↓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected
+   ↓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed
+   ↓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged
+   ↓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected
+   ↓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed
+   ↓ canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends
+   ✓ canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 18 skipped (19)
+   Start at  21:06:48
+   Duration  281ms (transform 39ms, setup 0ms, collect 29ms, tests 1ms, environment 0ms, prepare 53ms)
+
+khalenovbirzhan@MacBook-Air-Khalenov app % npx vitest run
+
+ RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ✓ src/booking.test.ts (19 tests) 2ms
+   ✓ canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 1ms
+   ✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 0ms
+   ✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+   ✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+   ✓ canBook function test suite (AC1–AC5) > BUG-A: allows a request touching bookings at both ends 0ms
+   ✓ canBook function test suite (AC1–AC5) > BUG-B: leaves bookings unchanged for an available request 0ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  21:06:51
+   Duration  246ms (transform 25ms, setup 0ms, collect 23ms, tests 2ms, environment 0ms, prepare 50ms)
+
+khalenovbirzhan@MacBook-Air-Khalenov app % cd /Users/khalenovbirzhan/Documents/se-practice
+khalenovbirzhan@MacBook-Air-Khalenov se-practice % git diff -- week-08/app/src/booking.ts
+diff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts
+index 4006661..7dc1b4d 100644
+--- a/week-08/app/src/booking.ts
++++ b/week-08/app/src/booking.ts
+@@ -23,6 +23,6 @@ export function canBook({ start, end, now, blocked, bookings }: {
+     if (start < b.end && end > b.start) return false;
+   }
+   // keep the room's list current with the slot that was just found free
+-  bookings.push({ start, end });
++  //bookings.push({ start, end });
+   return true;
+ }
+\ No newline at end of file
+
 ```
 
 ---
