@@ -68,7 +68,94 @@ You copied the whole `canBook` function from `buggy/booking.ts` (or `.js`) over 
 nothing else. This is the real output:
 
 ```text
-(paste here)
+RUN  v3.2.7 /Users/khalenovbirzhan/Documents/se-practice/week-08/app
+
+ ❯ src/booking.test.ts (17 tests | 3 failed) 7ms
+× canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed 4ms
+→ expected false to be true // Object.is equality
+✓ canBook function test suite (AC1–AC5) > T02: 540–570 (starts now) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T03: 720–720 (zero duration) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T04: 750–720 (reversed) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T05: 1380–1441 (past day end) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T06: 720–840 (120 minutes) should be allowed 0ms
+✓ canBook function test suite (AC1–AC5) > T07: 720–841 (121 minutes) should be rejected 0ms
+× canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed 0ms
+→ expected false to be true // Object.is equality
+✓ canBook function test suite (AC1–AC5) > T09: 630–690 (partial overlap) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T10: 570–690 (contains booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T11: 615–645 (inside booking) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T12: 600–660 (identical interval) should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T13: 660–720, blocked = true should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > T14: 630–690, bookings = [] should be allowed 0ms
+× canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged 1ms
+→ expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+✓ canBook function test suite (AC1–AC5) > X1: 0–60; now = 0, blocked = false, bookings = [] should be rejected 0ms
+✓ canBook function test suite (AC1–AC5) > X2: 1380–1440; now = 540, blocked = false, bookings = [] should be allowed 0ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T01: 660–720 (touching after) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+ ❯ src/booking.test.ts:10:20
+8|     const bookings = [{ start: 600, end: 660 }];
+9|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+10|     expect(result).toBe(true);
+|                    ^
+11|   });
+12| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > T08: 570–600 (touching before) should be allowed
+AssertionError: expected false to be true // Object.is equality
+- Expected
+- Received
+- true
+- false
+ ❯ src/booking.test.ts:53:20
+51|     const bookings = [{ start: 600, end: 660 }];
+52|     const result = canBook({ start: 570, end: 600, now: DEFAULT_NOW, blocked: false, bookings });
+53|     expect(result).toBe(true);
+|                    ^
+54|   });
+55| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/booking.test.ts > canBook function test suite (AC1–AC5) > AC5: Available request leaves bookings array unchanged
+AssertionError: expected [ { start: 800, end: 860 }, …(1) ] to deeply equal [ { start: 800, end: 860 } ]
+- Expected
+- Received
+  [
+  {
+  "end": 860,
+  "start": 800,
+  
+  },
+- {
+- "end": 720,
+- "start": 660,
+- },
+  ]
+ ❯ src/booking.test.ts:97:22
+95|     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
+96|     expect(result).toBe(true);
+97|     expect(bookings).toEqual(initialBookings);
+|                      ^
+98|   });
+99| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  1 failed (1)
+Tests  3 failed | 14 passed (17)
+Start at  18:56:41
+Duration  242ms (transform 27ms, setup 0ms, collect 24ms, tests 7ms, environment 0ms, prepare 41ms)
+
 ```
 
 ### 2.3 One failing test per bug
@@ -88,10 +175,10 @@ its bug.
 One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypothesis
 **before** you ask any assistant: the line and why.
 
-| Defect | Test ID | Input | Expected | Actual | Suspected cause (line and why) |
-| --- | --- | --- | --- | --- | --- |
-| BUG-A | | | | | |
-| BUG-B | | | | | |
+| Defect | Test ID | Input                                                                               | Expected                              | Actual                                                               | Suspected cause (line and why)                                                                                                                                               |
+|--------|---------|-------------------------------------------------------------------------------------|---------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BUG-A  | T01     | start=660, end=720, now=DEFAULT_NOW, blocked=false, bookings=[{start:600, end:660}] | true                                  | false                                                                | The overlap check uses <= and >=, so a request that ends when an existing booking starts—or starts when one ends—is treated as overlapping and returns false, violating AC4. |
+| BUG-B  | AC5     | start=660, end=720, now=DEFAULT_NOW, blocked=false, bookings=[{start:800, end:860}] | true; bookings остаётся без изменений | Результат true, но в bookings добавлен интервал {start:660, end:720} | The line with bookings.push({ start, end }) mutates the original bookings array before returning true, so the available slot is added to the input list, violating AC5.      |
 
 ---
 
