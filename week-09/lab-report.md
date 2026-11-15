@@ -39,18 +39,18 @@ say what you changed.
 
 | Case | First run | Final run | What you changed |
 | --- | --- | --- | --- |
-| S01 | | | |
-| S02 | | | |
-| S03 | | | |
-| S04 | | | |
-| S05 | | | |
-| S06 | | | |
-| S07 | | | |
-| S08 | | | |
-| S09 | | | |
-| S10 | | | |
-| S11 | | | |
-| S12 | | | |
+| S01 | PASS | PASS | The valid R1 call remains accepted. |
+| S02 | PASS | PASS | Empty bookings remain allowed. |
+| S03 | FAIL | PASS | Set end to integer, rejecting a time string. |
+| S04 | FAIL | PASS | Added now to the required fields. |
+| S05 | FAIL | PASS | Set additionalProperties to false to reject extra fields. |
+| S06 | FAIL | PASS | Set the minimum start value to 0. |
+| S07 | FAIL | PASS | Set the maximum end value to 1440. |
+| S08 | FAIL | PASS | Required both start and end inside each booking. |
+| S09 | FAIL | PASS | Set blocked to boolean, rejecting a string. |
+| S10 | FAIL | PASS | Set start to integer, rejecting fractional minutes. |
+| S11 | PASS | PASS | The inclusive maximum of 1440 keeps this valid call accepted. |
+| S12 | FAIL | PASS | Required each booking to be an object, rejecting an array pair. |
 
 ## 4. Function calling — what the model wrote
 
