@@ -1,26 +1,18 @@
 # AI Usage Disclosure — Week 09
 
-Required by the course academic policy (Generative AI use level **D — AI-integrated**).
-You are responsible for the accuracy, testing and integrity of everything you submit,
-including anything an AI tool produced.
-
 | Tool | Exact model / plan | Used for | Which files it touched |
 | --- | --- | --- | --- |
-| | | Part 2 — writing the calls for R1, R2, R3 | calls/ (saved by me, unedited) |
-| | | | |
+| Gemini | not displayed | Part 2 — writing the replies for R1, R2, R3 in three separate fresh chats | calls/r1.json, calls/r2.json, calls/r3.txt; exact copies in lab-report.md section 4 |
 
-**I wrote `tool/check_room.json` myself:** yes / no
-<!-- If an AI wrote or revised any of it, say which part, and how you checked it. -->
+**I wrote `tool/check_room.json` myself:** yes
 
-**I used an AI to explain a JSON Schema keyword or a check:** yes / no
-<!-- If "yes": which one, and for what. -->
+**I used an AI to explain a JSON Schema keyword or a check:** no
 
-**Every reply in `calls/` and in lab-report.md section 4 is exactly what the model returned:** yes / no
+**Every reply in `calls/` and in lab-report.md section 4 is exactly what the model returned:** yes
 
-**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes / no
+**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes
 
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the file and the part. An honest entry here costs far less than a blank one that turns out to be untrue. -->
-
-Signed: <your name>
-Date:
+**Anything I accepted from the AI without fully understanding it:** no
+ 
+Signed: Khalenov Birzhan  
+Date: 2026-11-15
