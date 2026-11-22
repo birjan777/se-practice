@@ -1,5 +1,8 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, it, expect } from 'vitest';
 import { canBook } from './booking';
+import App from './App';
 
 describe('canBook function test suite (AC1–AC5)', () => {
   const DEFAULT_NOW = 540;
@@ -142,4 +145,11 @@ describe('canBook function test suite (AC1–AC5)', () => {
     expect(bookings).toEqual(before);
   });
 
+});
+
+it('R2: the checker renders exactly one fictional room', () => {
+  const page = renderToStaticMarkup(createElement(App));
+
+  expect(page).toContain('Room A-101');
+  expect(page.match(/<option\b/g)).toHaveLength(1);
 });
