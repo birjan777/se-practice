@@ -1,0 +1,53 @@
+# Week 10 submission
+schema: 1
+week: "10"
+
+student:
+  name: "Khalenov Birzhan"
+  student_id: "25B030042"
+  github: "birjan777"
+
+assistant:
+  tool: "Gemini"
+  model: "not displayed"
+  environment: chat
+
+project:
+  starting_point: week-08
+  baseline_commit: c7b32ea
+  language: ts
+  vitest: "3.2.7"
+
+counts:
+  claims_challenged: 8
+  risks_registered: 6
+  risks_confirmed: 6
+  tests_final: 21
+  agents_lines_changed: 8
+
+audit:
+  level: 0
+
+decision:
+  top_two: [R1, R2]
+  mitigated: [R2, R3]
+  release: no-go
+
+checker:
+  pass: 31
+  fail: 0
+  error: 0
+  commit: 7311de2
+  known_fails: []
+
+review_findings:
+  - "The reviewer said that AC4 rejects bookings that touch at an endpoint. The assignment and the tests allow them."
+  - "The R2 test found two room options before the fix. After the fix, it found one."
+  - "For R3, the old code could show both an error and Unavailable. The fixed app shows only the error."
+  - "AGENTS.md listed npm run test:unit, but package.json has no test:unit script. The tests passed with npx vitest run."
+
+honesty:
+  review_was_read_only: yes
+  agents_patch_approved_by_me: yes
+  outputs_unedited: yes
+  ai_usage_disclosed: yes
