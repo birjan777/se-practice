@@ -1,24 +1,23 @@
 # Week 10 — Lab report
 
-**Name:** birjan777 (GitHub submission handle)
+**Name:** Khalenov Birzhan
 
-**Group:** To be supplied by the student if required
+**Group:** Monday 16-19:00
 
-**Date:** 22 November 2026 (Almaty)
+**Date:** 22 November 2026  
 
-This is the working report. Codex drafted the analysis and ran the checks. Student review and the student's conclusion are pending. The project owner elected to write the playbook patch personally.
 
 ## 1. Setup
 
-| | |
-| --- | --- |
-| Assistant I reviewed with (tool) | ChatGPT |
-| Exact model (with its version, or `not displayed`) | not displayed |
-| Where the assistant read the project (Bolt.new / Claude Code / Cursor / Copilot / chat with pasted files) | Separate ChatGPT browser chat with pasted checkpoint files and excerpts |
-| Starting point (`week-08` or `week-07`) | `week-08` |
-| Baseline commit — the checkpoint of Part 0 | `c7b32ea` |
-| Where I ran the tests (Bolt terminal / my computer / Codespace) | Local macOS checkout, via Codex (Node 24.20.0) |
-| Vitest version (the `RUN  v…` line of a run) | 3.2.7 |
+|                                                                                                           |                                    |
+|-----------------------------------------------------------------------------------------------------------|------------------------------------|
+| Assistant I reviewed with (tool)                                                                          | Gemini                             |
+| Exact model (with its version, or `not displayed`)                                                        | not displayed                      |
+| Where the assistant read the project (Bolt.new / Claude Code / Cursor / Copilot / chat with pasted files) | Gemini read chat with pasted files |
+| Starting point (`week-08` or `week-07`)                                                                   | `week-08`                          |
+| Baseline commit — the checkpoint of Part 0                                                                | `c7b32ea`                          |
+| Where I ran the tests (Bolt terminal / my computer / Codespace)                                           | my computer                        |
+| Vitest version (the `RUN  v…` line of a run)                                                              | 3.2.7                              |
 
 The checkpoint was based on the GitHub `main` head `4cb692d`. It copies the tracked Week 08 app and the provided playbook. The Week 08 app and the starter files were committed before changing code.
 
@@ -28,13 +27,13 @@ The checkpoint was based on the GitHub `main` head `4cb692d`. It copies the trac
 
 `npm install` completed from the existing npm cache in offline mode. Each listed command was attempted in `app/`.
 
-| Command | Exists | Result | Note |
-| --- | --- | --- | --- |
-| `npx vitest run` | yes | pass | Vitest 3.2.7, all 19 tests passed. |
-| `npm test` | no | missing | npm reported a missing `test` script. |
-| `npm run test:unit` (the test command in `AGENTS.md`) | no | missing | npm reported a missing `test:unit` script. |
-| `npm run build` | yes | pass | TypeScript and Vite both completed, exit 0. |
-| `npm run lint` | no | missing | npm reported a missing `lint` script. |
+| Command                                               | Exists  | Result  | Note                                        |
+|-------------------------------------------------------|---------|---------|---------------------------------------------|
+| `npx vitest run`                                      | yes     | pass    | Vitest 3.2.7, all 19 tests passed.          |
+| `npm test`                                            | no      | missing | npm reported a missing `test` script.       |
+| `npm run test:unit` (the test command in `AGENTS.md`) | no      | missing | npm reported a missing `test:unit` script.  |
+| `npm run build`                                       | yes     | pass    | TypeScript and Vite both completed, exit 0. |
+| `npm run lint`                                        | no      | missing | npm reported a missing `lint` script.       |
 
 ### 2.2 The baseline test run
 
@@ -550,16 +549,16 @@ The next sensible step is a baseline test and build run, followed by narrowly sc
 
 These labels come from Codex's inspection of the checkpoint and the recorded local runs. Reviewer item labels below refer to its reply, and register IDs refer to `4. The owner still needs to verify these against the code personally.
 
-| # | The AI's claim (short) | Category | What I inspected | Label | Why |
-| --- | --- | --- | --- | --- | --- |
-| 1 | C1: allowing requests to touch endpoints violates AC4. | Correctness | Week 10 README `3, `src/booking.ts:22–24`, T01/T08/BUG-A in `src/booking.test.ts` | unsupported | The overlap predicate is strict and the authoritative contract explicitly allows touching. All 19 baseline tests passed. |
-| 2 | C2: an invalid time range can coexist with an availability result. | Correctness | Checkpoint `src/App.tsx:44–58,118–124` and `src/booking.ts:18` | confirmed | A reversed interval sets the error, then calls `canBook` and stores `false`. The JSX displays the error and Unavailable in separate branches. |
-| 3 | R1: a prior availability result remains after form changes. | Reliability | Checkpoint `src/App.tsx:27,32–58,77–112` | confirmed | Field handlers update the form values, while `result` changes only on Check. Changing the blocked box can leave an earlier Available visible. |
-| 4 | M2: `CanBookInput` is defined and then duplicated inline. | Maintainability | Complete `src/booking.ts:1–17` | confirmed | The parameter uses an inline type. The declared `CanBookInput` is unused. |
-| 5 | C8/M4: a comment encourages an AC5-breaking mutation. | Maintainability | `src/booking.ts:25–27` and the AC5/BUG-B assertions | confirmed | The comment suggests updating bookings. The line is commented out and the two green tests check that the array stays unchanged. |
-| 6 | A1: the playbook directs an external production deployment. | Agent operations | `app/AGENTS.md`, Before you finish, versus the README's scope | confirmed | The line names a production deploy even though the lab requires local fictional scope. No deploy was attempted. |
-| 7 | A4: the project's documented test command cannot run. | Agent operations | `app/AGENTS.md`, `app/package.json`, baseline `npm run test:unit` | confirmed | npm reported a missing script. Direct Vitest worked. |
-| 8 | P1: unexpected browser requests could carry interaction data. | Privacy | `app/index.html`, `src/main.tsx` and `src/App.tsx` | plausible | The entry points contain no external script or telemetry call. Runtime network and storage observation could not be done in this environment. |
+| #    | The AI's claim (short)                                             | Category         | What I inspected                                                                  | Label       | Why                                                                                                                                           |
+|------|--------------------------------------------------------------------|------------------|-----------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1    | C1: allowing requests to touch endpoints violates AC4.             | Correctness      | Week 10 README `3, `src/booking.ts:22–24`, T01/T08/BUG-A in `src/booking.test.ts` | unsupported | The overlap predicate is strict and the authoritative contract explicitly allows touching. All 19 baseline tests passed.                      |
+| 2    | C2: an invalid time range can coexist with an availability result. | Correctness      | Checkpoint `src/App.tsx:44–58,118–124` and `src/booking.ts:18`                    | confirmed   | A reversed interval sets the error, then calls `canBook` and stores `false`. The JSX displays the error and Unavailable in separate branches. |
+| 3    | R1: a prior availability result remains after form changes.        | Reliability      | Checkpoint `src/App.tsx:27,32–58,77–112`                                          | confirmed   | Field handlers update the form values, while `result` changes only on Check. Changing the blocked box can leave an earlier Available visible. |
+| 4    | M2: `CanBookInput` is defined and then duplicated inline.          | Maintainability  | Complete `src/booking.ts:1–17`                                                    | confirmed   | The parameter uses an inline type. The declared `CanBookInput` is unused.                                                                     |
+| 5    | C8/M4: a comment encourages an AC5-breaking mutation.              | Maintainability  | `src/booking.ts:25–27` and the AC5/BUG-B assertions                               | confirmed   | The comment suggests updating bookings. The line is commented out and the two green tests check that the array stays unchanged.               |
+| 6    | A1: the playbook directs an external production deployment.        | Agent operations | `app/AGENTS.md`, Before you finish, versus the README's scope                     | confirmed   | The line names a production deploy even though the lab requires local fictional scope. No deploy was attempted.                               |
+| 7    | A4: the project's documented test command cannot run.              | Agent operations | `app/AGENTS.md`, `app/package.json`, baseline `npm run test:unit`                 | confirmed   | npm reported a missing script. Direct Vitest worked.                                                                                          |
+| 8    | P1: unexpected browser requests could carry interaction data.      | Privacy          | `app/index.html`, `src/main.tsx` and `src/App.tsx`                                | plausible   | The entry points contain no external script or telemetry call. Runtime network and storage observation could not be done in this environment. |
 
 ## 4. Task 4 — the risk register
 
@@ -567,14 +566,14 @@ These labels come from Codex's inspection of the checkpoint and the recorded loc
 
 Scores describe the baseline. The presence of a risky instruction or code path is confirmed by source, which does not imply the adverse outcome already occurred.
 
-| ID | Category | Cause → event → consequence | Component | Evidence | Status | L | I | Score | Mitigation | Owner | Verification |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| R1 | Agent operations | Mandatory production preview → a credentialed agent follows the playbook → an unapproved build can become public. | `AGENTS.md` | The final instruction names a production deployment, contrary to README `3. It can also send an agent toward tooling outside package.json. | confirmed | 2 | 3 | 6 | Remove the production preview directive and explicitly prohibit external deployments. Pending owner edit. | Project owner | Inspect the applied diff and rerun A2/A3/C5. Review commands without executing a deploy. |
-| R2 | Correctness | Two fixtures in the page → a second selectable room reaches the app → the graded single-room scope fails. | `src/App.tsx` | Checkpoint `ROOMS` and its select map expose A-101 and B-204. The R2 test observes two options on the checkpoint. | confirmed | 3 | 2 | 6 | Put the one fictional fixture and pure availability evaluation in `src/roomAvailability.ts` and use it from the page. | Project owner | Render the real App in Vitest, assert one room, and rerun original AC1–AC5 tests. |
-| R3 | Correctness | Reversed or equal times set an error without returning → the same submission displays Unavailable → a validation error looks like a booking conflict. | `src/App.tsx` | Checkpoint `check()` continues into `canBook` and stores `false`, while JSX renders both messages. | confirmed | 2 | 2 | 4 | Use a validation-only result with `available: null` before evaluating availability. | Project owner | Run R3 with reversed and equal intervals, then verify the feedback visually. |
-| R4 | Reliability | Check result persists while form values change → a prior answer is read as current → a user may rely on stale feedback. | `src/App.tsx` | Form onChange handlers do not clear the previous `result` or `error`. | confirmed | 2 | 2 | 4 | Open. Recheck after changing fields for the exercise. A follow-up could clear the result when input changes. | Project owner | In the browser, check an available slot, change the blocked box, and inspect feedback before pressing Check again. |
-| R5 | Maintainability | Comment encourages updating bookings → a future change restores the commented push → repeated checks can change the fixture and AC5 result. | `src/booking.ts canBook` | The inactive push and preceding comment are still present. AC5 and BUG-B assert unchanged fixtures. | confirmed | 2 | 2 | 4 | Open. Keep AC5/BUG-B as the gate and remove the misleading comment in a separate cleanup. | Project owner | Read `canBook` and rerun the AC5 and BUG-B tests on each proposed change. |
-| R6 | Reliability | Checks are local only → a push can omit testing → a broken change reaches review with no automated record. | missing: push CI workflow for the app | No workflow in `app/.github/workflows/` or at repository root on the checkpoint. | confirmed | 2 | 2 | 4 | Open. Attach real CLI output to each change and add an automated check when raising readiness. | Project owner | Inspect a push-triggered workflow and confirm it invokes Vitest and the build. |
+| ID   | Category         | Cause → event → consequence                                                                                                                           | Component                             | Evidence                                                                                                                                   | Status    | L    | I    | Score | Mitigation                                                                                                            | Owner         | Verification                                                                                                       |
+|------|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------|------|------|-------|-----------------------------------------------------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------------|
+| R1   | Agent operations | Mandatory production preview → a credentialed agent follows the playbook → an unapproved build can become public.                                     | `AGENTS.md`                           | The final instruction names a production deployment, contrary to README `3. It can also send an agent toward tooling outside package.json. | confirmed | 2    | 3    | 6     | Remove the production preview directive and explicitly prohibit external deployments. Pending owner edit.             | Project owner | Inspect the applied diff and rerun A2/A3/C5. Review commands without executing a deploy.                           |
+| R2   | Correctness      | Two fixtures in the page → a second selectable room reaches the app → the graded single-room scope fails.                                             | `src/App.tsx`                         | Checkpoint `ROOMS` and its select map expose A-101 and B-204. The R2 test observes two options on the checkpoint.                          | confirmed | 3    | 2    | 6     | Put the one fictional fixture and pure availability evaluation in `src/roomAvailability.ts` and use it from the page. | Project owner | Render the real App in Vitest, assert one room, and rerun original AC1–AC5 tests.                                  |
+| R3   | Correctness      | Reversed or equal times set an error without returning → the same submission displays Unavailable → a validation error looks like a booking conflict. | `src/App.tsx`                         | Checkpoint `check()` continues into `canBook` and stores `false`, while JSX renders both messages.                                         | confirmed | 2    | 2    | 4     | Use a validation-only result with `available: null` before evaluating availability.                                   | Project owner | Run R3 with reversed and equal intervals, then verify the feedback visually.                                       |
+| R4   | Reliability      | Check result persists while form values change → a prior answer is read as current → a user may rely on stale feedback.                               | `src/App.tsx`                         | Form onChange handlers do not clear the previous `result` or `error`.                                                                      | confirmed | 2    | 2    | 4     | Open. Recheck after changing fields for the exercise. A follow-up could clear the result when input changes.          | Project owner | In the browser, check an available slot, change the blocked box, and inspect feedback before pressing Check again. |
+| R5   | Maintainability  | Comment encourages updating bookings → a future change restores the commented push → repeated checks can change the fixture and AC5 result.           | `src/booking.ts canBook`              | The inactive push and preceding comment are still present. AC5 and BUG-B assert unchanged fixtures.                                        | confirmed | 2    | 2    | 4     | Open. Keep AC5/BUG-B as the gate and remove the misleading comment in a separate cleanup.                             | Project owner | Read `canBook` and rerun the AC5 and BUG-B tests on each proposed change.                                          |
+| R6   | Reliability      | Checks are local only → a push can omit testing → a broken change reaches review with no automated record.                                            | missing: push CI workflow for the app | No workflow in `app/.github/workflows/` or at repository root on the checkpoint.                                                           | confirmed | 2    | 2    | 4     | Open. Attach real CLI output to each change and add an automated check when raising readiness.                        | Project owner | Inspect a push-triggered workflow and confirm it invokes Vitest and the build.                                     |
 
 ### 4.2 The top two for action
 
@@ -587,20 +586,20 @@ Scores describe the baseline. The presence of a risky instruction or code path i
 
 This audit uses the submitted app tree. Row 3c was absent at the checkpoint and is present after the R2 integration test.
 
-| Row | What | yes / no | Evidence |
-| --- | --- | --- | --- |
-| 1a | Formatter | no | No Prettier configuration or dependency in `app/`. |
-| 1b | Linter | no | No ESLint config or dependency. `npm run lint` returned missing script. |
-| 1c | Type checks | yes | `app/tsconfig.json` and `typescript` in `app/package.json`. Build invokes `tsc`. |
-| 1d | Unit tests | yes | `src/booking.test.ts` and `vitest` in `app/package.json`. |
-| 1e | Pinned dependencies (lockfile) | yes | Git tracks `app/package-lock.json`. |
-| 2a | `.env.example` | no | No `app/.env.example`. There are no required app environment variables. |
-| 2b | Architecture notes | no | No application README or dedicated architecture document explaining the UI, fixture and availability module boundaries. |
-| 2c | `AGENTS.md` | yes | `app/AGENTS.md` exists. Its conflicts are covered in `6. |
-| 3a | CI | no | No push workflow for the app. |
-| 3b | Pre-commit hooks | no | No committed app hooks or hook runner in `package.json`. |
-| 3c | Integration checks | yes | The R2 test renders the real `App` through React DOM's static renderer with the actual one-room module. No browser interaction is covered by that check. |
-| 3d | Reviewable evidence | no | There is no app CI log or app PR template requiring evidence from future agent changes. This report holds one exercise's local outputs. |
+| Row  | What                           | yes / no | Evidence                                                                                                                                                 |
+|------|--------------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1a   | Formatter                      | no       | No Prettier configuration or dependency in `app/`.                                                                                                       |
+| 1b   | Linter                         | no       | No ESLint config or dependency. `npm run lint` returned missing script.                                                                                  |
+| 1c   | Type checks                    | yes      | `app/tsconfig.json` and `typescript` in `app/package.json`. Build invokes `tsc`.                                                                         |
+| 1d   | Unit tests                     | yes      | `src/booking.test.ts` and `vitest` in `app/package.json`.                                                                                                |
+| 1e   | Pinned dependencies (lockfile) | yes      | Git tracks `app/package-lock.json`.                                                                                                                      |
+| 2a   | `.env.example`                 | no       | No `app/.env.example`. There are no required app environment variables.                                                                                  |
+| 2b   | Architecture notes             | no       | No application README or dedicated architecture document explaining the UI, fixture and availability module boundaries.                                  |
+| 2c   | `AGENTS.md`                    | yes      | `app/AGENTS.md` exists. Its conflicts are covered in `6.                                                                                                 |
+| 3a   | CI                             | no       | No push workflow for the app.                                                                                                                            |
+| 3b   | Pre-commit hooks               | no       | No committed app hooks or hook runner in `package.json`.                                                                                                 |
+| 3c   | Integration checks             | yes      | The R2 test renders the real `App` through React DOM's static renderer with the actual one-room module. No browser interaction is covered by that check. |
+| 3d   | Reviewable evidence            | no       | There is no app CI log or app PR template requiring evidence from future agent changes. This report holds one exercise's local outputs.                  |
 
 ### 5.2 The level and the gaps
 
@@ -609,7 +608,8 @@ This audit uses the submitted app tree. Row 3c was absent at the checkpoint and 
 **Missing evidence for the next level:**
 
 - Level 1 is 3/5 (60%). A committed formatter configuration/dependency (1a) or a linter configuration/dependency (1b) would bring it to the 4/5 threshold. Level 2 is 1/3 and Level 3 is 1/4. A level also requires the preceding levels.
-- `app/` has no README. The assignment README documents the exercise. The app entry point, UI and domain source are easy to locate under `src/`. The playbook is inaccurate about the test command and the scope, which matters more than the folder layout.
+- `app/` has no README. The assignment README documents the exercise. The app entry point, UI, and booking logic are in `src/`. The updated `app/AGENTS.md` describes the one-room scope and lists `npx vitest run` as the test command.
+
 
 ## 6. Task 6 — the agent playbook
 
@@ -837,24 +837,73 @@ One outstanding point: AC6 should be confirmed against its authoritative definit
 
 ### 6.2 Findings and my decisions
 
-These are draft review decisions for the owner. The owner chose to write and apply the actual changes personally.
+| #    | Rule or line in AGENTS.md                       | Missing / conflicting                                       | Decision | Why                                                                                                                               |
+|------|-------------------------------------------------|-------------------------------------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------|
+| 1    | Real names and timetable from the portal        | Conflicts with one fictional room.                          | modify   | Replace that one line with an explicit fictional-room scope and prohibition on real timetables.                                   |
+| 2    | Supabase and login page                         | Conflicts with the no-login/no-database scope.              | modify   | Replace the permission in place with a direct prohibition.                                                                        |
+| 3    | AC4 counts touching as overlap                  | Conflicts with the authoritative AC4.                       | reject   | I rejected the suggestion to count endpoint touching as an overlap. I updated AC4 to allow slots that only touch at an endpoint.  |
+| 4    | AC6 missing                                     | The original playbook lists only AC1–AC5.                   | modify   | Add the real AC6 requirement about clear desktop and mobile feedback, rather than the reviewer's generic placeholder.             |
+| 5    | No exclusion for secrets                        | Missing a rule forbidding secrets and credentials.          | approve  | Add one concise rule listing forbidden secrets and credentials.                                                                   |
+| 6    | Production deploy after build                   | Conflicts with the no-external-deployment scope.            | modify   | Replace the instruction with an unconditional ban for this project. Reject exceptions for preview deployments.                    |
+| 7    | `npm run test:unit`                             | References a missing package script.                        | modify   | Use `npx vitest run`, which was verified in the baseline and final run.                                                           |
+| 8    | Page load as the only acceptance check          | Missing an explicit test/build gate.                        | approve  | Require observed tests and build before proposing acceptance.                                                                     |
+| 9    | Proposed whole-file rewrite and extra headings  | Conflicts with the minimal patch rule.                      | reject   | Preserve all the existing headings and change only the lines needed for C1–C6.                                                    |
+| 10   | Extra preview command and package policy        | The preview script exists but is beyond the repairs needed. | reject   | Avoid unrelated instructions and keep the change within the line budget.                                                          |
 
-| # | Rule or line in AGENTS.md | Missing / conflicting | Decision | Why |
-| --- | --- | --- | --- | --- |
-| 1 | Real names and timetable from the portal | Conflicts with one fictional room. | modify | Replace that one line with an explicit fictional-room scope and prohibition on real timetables. |
-| 2 | Supabase and login page | Conflicts with the no-login/no-database scope. | modify | Replace the permission in place with a direct prohibition. |
-| 3 | AC4 counts touching as overlap | Conflicts with the authoritative AC4. | reject | Reject the reviewer's proposed endpoint rejection. Keep strict overlap in code and document that endpoint touching is allowed. |
-| 4 | AC6 missing | The original playbook lists only AC1–AC5. | modify | Add the real AC6 requirement about clear desktop and mobile feedback, rather than the reviewer's generic placeholder. |
-| 5 | No exclusion for secrets | Missing a rule forbidding secrets and credentials. | approve | Add one concise rule listing forbidden secrets and credentials. |
-| 6 | Production deploy after build | Conflicts with the no-external-deployment scope. | modify | Replace the instruction with an unconditional ban for this project. Reject exceptions for preview deployments. |
-| 7 | `npm run test:unit` | References a missing package script. | modify | Use `npx vitest run`, which was verified in the baseline and final run. |
-| 8 | Page load as the only acceptance check | Missing an explicit test/build gate. | approve | Require observed tests and build before proposing acceptance. |
-| 9 | Proposed whole-file rewrite and extra headings | Conflicts with the minimal patch rule. | reject | Preserve all the existing headings and change only the lines needed for C1–C6. |
-| 10 | Extra preview command and package policy | The preview script exists but is beyond the repairs needed. | reject | Avoid unrelated instructions and keep the change within the line budget. |
+
 
 ### 6.3 The approved patch
 
-Pending. The owner asked to write `app/AGENTS.md` personally. `cmp provided/AGENTS.md app/AGENTS.md` succeeded after the code changes. There is no applied diff to paste yet.
+```diff
+diff --git a/week-10/app/AGENTS.md b/week-10/app/AGENTS.md
+index b786d88..c8eb8ea 100644
+--- a/week-10/app/AGENTS.md
++++ b/week-10/app/AGENTS.md
+@@ -9,30 +9,36 @@ A React + TypeScript page (Vite) that tells a student whether a campus room is f
+ requested time. The booking rule lives in `src/booking.ts` (`canBook`); the page is `src/App.tsx`;
+ the tests are in `src/booking.test.ts`.
+ 
+-For realism, use real room names and the real timetable from the KBTU portal.
++
++Use one fictional room with synthetic bookings only. Do not use real room names or timetables.
+ 
+ ## Acceptance contract
+ 
+ - AC1 Reject start ≥ end and requests in the past.
+ - AC2 Enforce the maximum allowed duration (120 minutes).
+ - AC3 Reject a blocked room.
+-- AC4 Reject overlaps. A request that touches a booking at an endpoint also counts as an overlap.
++- AC4 Reject overlapping bookings and allow requests that only touch at an endpoint.
+ - AC5 Return Available / Unavailable without changing booking data.
++- AC6 Show clear availability and validation feedback on desktop and mobile.
+ 
+ ## Commands
+ 
+ - Install: `npm install`
+ - Dev server: `npm run dev`
+-- Tests: `npm run test:unit`
++- Tests: `npx vitest run`
+ - Build: `npm run build`
+ 
+ ## You may
+ 
+ - Edit any file in the project.
+ - Add packages when a task needs them.
+-- If bookings need to persist, add a small Supabase table and a login page.
++- Do not add login, authentication or a database.
++- Do not store credentials or commit secrets.
+ 
+ ## Before you finish
+ 
+ - Make sure the page still loads.
+-- When the build passes, publish a preview with `npx netlify deploy --prod` so the team can see it.
++- Run the tests (`npx vitest run`) and build (`npm run build`). Both must pass before proposing acceptance.
++- Do not deploy or publish the app externally.
++
++
+```
+
+
 
 ## 7. Task 7 — verify safely
 
@@ -916,22 +965,28 @@ AssertionError: expected [ '<option', '<option' ] to have a length of 1 but got 
    Start at  13:20:22
    Duration  241ms (transform 39ms, setup 0ms, collect 50ms, tests 7ms, environment 0ms, prepare 48ms)
 ```
-
 ### 7.2 The manual UI check
 
-| View | Width | What I checked | Result | Screenshot |
-| --- | --- | --- | --- | --- |
-| Desktop | | Planned: available, blocked and invalid requests, full layout. | Not run. Vite's loopback listener returned EPERM. | `evidence/ui-desktop.png` pending |
-| Mobile | | Planned: same feedback at phone width, labels and no horizontal overflow. | Not run. Vite's loopback listener returned EPERM. | `evidence/ui-mobile.png` pending |
+| View    | Width            | What I checked                                           | Result                                                                    | Screenshot                                    |
+|---------|------------------|----------------------------------------------------------|---------------------------------------------------------------------------|-----------------------------------------------|
+| Desktop | DESKTOP_WIDTH px | I checked Room A-101 from 11:00 to 12:00.                | I saw **Available** below the button.                                     | [Desktop screenshot](evidence/ui-desktop.png) |
+| Mobile  | 390 px           | I set the start time to 11:00 and the end time to 10:30. | I saw only the error message “The end time must be after the start time.” | [Mobile screenshot](evidence/ui-mobile.png)   |
 
-The SSR regression test checks the rendered room markup only. AC6's manual two-width check still needs a browser with a running local app.
+I used Tab to move through the form, Space to tick Room blocked, and Enter to check availability. I could see which field or button was selected.
+
+I also tried both time examples in Safari and Chrome. I got the same results in both browsers.
+
+I checked Fetch/XHR requests and compared Local Storage, Session Storage, and Cookies before and after clicking the button.
+
+I ran `npm audit`. It found five vulnerabilities: two moderate, one high, and two critical. npm suggested major updates for Vite and Vitest.
 
 ### 7.3 Tests and checks I did not run
 
-- Desktop/mobile visual smoke tests, keyboard navigation and browser network/storage inspection. The dev server could not bind `127.0.0.1:5173` in the execution environment.
-- Online `npm audit`. Dependencies were installed from the cached lockfile offline. No claim about vulnerability status.
-- Browser/device matrix and automated end-to-end interaction suite. Only the declared Vitest suite and build were available here.
-- Deployment, authentication and database checks. Those features are out of this exercise's scope.
+- I did not run automated browser tests. I checked the page manually.
+- I did not test on a real phone. I used mobile mode in Chrome.
+- I did not test deployment, login, or the database because those are outside this exercise.
+
+
 
 ## 8. Task 8 — mitigate two risks
 
@@ -945,13 +1000,13 @@ Refactor the availability logic into a small, pure module, keeping the existing 
 
 **Problem → pattern → benefit:**
 
-The component mixed two room fixtures, selection state, time conversion and availability decisions, making the one-room contract hard to see and verify. Extracting the decision and one-room fixture into a small pure module lets the page collect inputs and render the answer while the existing `canBook` stays the single source of booking rules.
+`App.tsx` had two rooms and handled both the form and the availability check. The patch moved the availability check into a small pure module called `roomAvailability.ts`, so the page is easier to read and `canBook` still handles the booking rules.
 
 **What I rejected from the agent's patch, and why:**
 
-Codex rejected an AC4 rewrite because the handout already matches the code. It also rejected a dependency on React Testing Library and a wrapper that only forwards to `canBook`. The committed evaluator owns parsing and preparation and takes booking data as an input. A single option preserves the visual structure while removing the out-of-scope room. The original 19 expectations were kept, and the R2 test passed with them after the change.
+I rejected changing AC4 because bookings that touch at an endpoint are allowed. I also left out React Testing Library and a function that only called `canBook`. The existing tools were enough to test that the page shows exactly one room.
 
-The diff reviewed by Codex before commit:
+**Diff for R2**
 
 ```diff
 diff --git a/week-10/app/src/App.tsx b/week-10/app/src/App.tsx
@@ -1120,9 +1175,9 @@ index 0000000..b706c39
 
 **What I rejected from the agent's patch, and why:**
 
-Codex rejected duplicating the interval guard in React or returning only a boolean from the pure helper. A boolean-only assertion would pass for an invalid request that still displays Unavailable. The test asserts the exact error and `available: null` for both reversed and equal times. Before the guard was added, it failed because the result was `false`.
+I rejected adding the same time check to React and returning only `true` or `false`. Before the fix, an invalid time could show both an error and **Unavailable**. The new test checks two cases: when the end time is earlier than the start and when both times are equal. In both cases, the function returns the error and `available: null`.
 
-The diff reviewed by Codex before commit:
+**Diff for R3**
 
 ```diff
 diff --git a/week-10/app/src/booking.test.ts b/week-10/app/src/booking.test.ts
@@ -1183,11 +1238,11 @@ index b706c39..230d0f2 100644
 ```
 
 ### 8.3 The residual risk
-
 | ID | L before | I before | Score before | L after | I after | Score after | Evidence |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| R2 | 3 | 2 | 6 | 1 | 2 | 2 | The real-page rendering test observed two options before and one after. A future component change could reintroduce another room. |
-| R3 | 2 | 2 | 4 | 1 | 2 | 2 | The reversed and equal requests both produce `available: null` with the expected error after the guard. Browser feedback at both widths remains to be checked. |
+|---|---|---|---|---|---|---|---|
+| R2 | 3 | 2 | 6 | 1 | 2 | 2 | The test found two room options before the fix and one after it. A future UI change could add another room. |
+| R3 | 2 | 2 | 4 | 1 | 2 | 2 | The test checks reversed and equal times. I also checked 11:00–10:30 in the browser and saw only the error message. |
+
 
 ### 8.4 The final run
 
@@ -1225,46 +1280,31 @@ dist/assets/index-DMKs4pse.js   144.79 kB │ gzip: 46.60 kB
 
 ### 9.1 A background agent on this project
 
-| Rule | What I require |
-| --- | --- |
-| Isolation | Use a separate worktree on a topic branch from the current `week-10` head. Keep `main` and the owner's worktree free of agent edits. |
-| Permitted files | Keep the audit read-only. A reviewed patch may edit only named files such as `week-10/app/src/roomAvailability.ts`, `src/App.tsx` or `src/booking.test.ts`. The owner handles `app/AGENTS.md`. |
-| Commands | From `week-10/app`, use `npm install`, `npx vitest run` and `npm run build`. From `week-10`, use `python3 tests/check_audit.py` and `python3 tests/validate_submission.py`. |
-| Prohibited actions | Keep to fictional data. Forbid credentials, real timetables, login, databases, external deployments, commits on `main` and automatic merges. |
-| Required evidence | Attach `git diff`, exact test and build output, regression evidence, a risk-register update and a short note identifying skipped checks. |
-| Before merging or deploying | The owner reviews the diff, verifies AC1–AC6 and checks the release gate. Keep the coursework PR open for grading and deployments prohibited. |
+| Rule                        | What I require                                                                                                                                                                 |
+|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Isolation                   | Work in a separate Git worktree on a new branch based on `week-10`.                                                                                                            |
+| Permitted files             | Read the project during the review. After I approve a patch, edit only the agreed files in `week-10/app/src/`, such as `App.tsx`, `roomAvailability.ts`, or `booking.test.ts`. |
+| Commands                    | In `week-10/app`, run `npm install`, `npx vitest run`, and `npm run build`. In `week-10`, run `python3 tests/check_audit.py` and `python3 tests/validate_submission.py`.       |
+| Prohibited actions          | Use fictional data only. Do not use credentials, add a login or database, deploy the app, commit to `main`, or merge the PR.                                                   |
+| Required evidence           | Show me the `git diff`, the test and build output, and a short note on what changed. Explain which risk the change fixes and list any checks you skipped.                      |
+| Before merging or deploying | I review the diff and check AC1–AC6 before I approve the changes. The PR stays open for grading. The app stays local.                                                          |
 
 ### 9.2 Optional — the deck's checklist prompt (not graded)
 
-The optional checklist prompt was not sent.
+I skipped the optional checklist prompt.
 
 ### 9.3 Checks I am keeping as FAIL or ERROR
 
-These are the observed checker findings. The student should review them and explain the retained items in their own words.
+None. All 31 audit checks passed.
 
-| Check | Why it stays |
-| --- | --- |
-| A2 | The owner asked to write the minimal playbook patch personally. The copy in app/ is still identical to provided/. |
-| A3 | The unpatched playbook names a nonexistent test script and a deploy tool absent from package.json. |
-| C1 | The provided playbook still requests real institutional room and timetable data. |
-| C2 | The provided playbook still authorizes Supabase and a login. |
-| C3 | The provided playbook rejects endpoint touching and omits AC6. |
-| C4 | The provided playbook has no rule forbidding secrets. |
-| C5 | The provided playbook still directs an external production deployment. |
-| C6 | The provided playbook has no gate requiring successful tests before acceptance. |
-| E1 | Desktop screenshot pending. Vite could not bind the local port. |
-| E2 | Phone-width screenshot pending. Vite could not bind the local port. |
-| L9 | The playbook review was captured. Applying and recording the patch is reserved for the owner. |
-| L10 | Manual AC6 check at both widths remains pending. The SSR test did not establish visual behavior. |
-| L13 | The student must write the 80–150 word conclusion personally. |
 
-The declaration validator also reports D3 because the KBTU ID was withheld from this public-repository draft.
 
 ## 10. Release decision and conclusion
 
 **Decision:** NO-GO
 
-<!-- Write your conclusion below this line -->
+I would keep the app as a local demo for now. For R2, the app now shows only Room A-101, and the test checks that there is exactly one room option. For R3, I checked an invalid time range in the mobile view and saw only the error message. All 21 tests passed, and the build was successful.
 
-<!-- Student's own conclusion pending. Use 80–150 words and at least two risk IDs. Review R1, R2, R3, and the missing manual AC6 evidence before making the final decision. -->
+I chose NO-GO because `npm audit` reported two critical vulnerabilities and R6 is still open. The project has no CI, so I have to run the checks myself. Before changing my decision, I would review the dependency updates and run the full test suite again.
+
 
