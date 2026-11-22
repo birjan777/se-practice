@@ -1,0 +1,44 @@
+schema: 1
+assignment: "sis-04"
+
+student:
+  name: "Khalenov Birzhan"
+  student_id: "25B030042"
+  group: "Monday 16:00-19:00"
+  github: "birjan777"
+
+assistant:
+  tool: "Gemini"
+  model: "not displayed"
+
+project:
+  start_from: week-08
+  baseline_commit: aea0c64
+  language: ts
+  vitest: "3.2.7"
+
+counts:
+  rooms: 4
+  tests_original: 19
+  tests_final: 28
+  risks: 4
+  exchanges: 3
+
+checker:
+  pass: 33
+  fail: 0
+  error: 0
+  commit: 7acc462
+  known_fails: [ ]
+
+review_findings:
+  - "F2: The filter requires projector and whiteboard together. The F2 test verifies that a projector-only room is excluded."
+  - "F5: The baseline kept its last result when the room changed. The final browser check switches from unavailable A-101 to available B-204 at the same time."
+  - "B5 and B6: The AI test discussion used the wrong labels. The committed cases test exact capacity and one seat short, as required."
+  - "src/booking.ts: checkRoom uses the selected room's bookings and blocked flag, then calls canBook."
+
+honesty:
+  baseline_unchanged: yes
+  runs_unedited: yes
+  no_invented_metrics: yes
+  ai_usage_disclosed: yes

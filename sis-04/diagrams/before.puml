@@ -1,0 +1,15 @@
+@startuml
+title Week 08 baseline
+component "main.tsx" as Main
+component "App.tsx" as App
+component "booking.ts" as Booking
+component "index.css" as Styles
+
+Main --> App : renders
+Main --> Styles : imports
+App --> Booking : canBook()
+note right of App
+  Two inline rooms, time inputs,
+  global blocked flag and result state
+end note
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+title SIS 04 room catalog
+component "main.tsx" as Main
+component "App.tsx" as App
+component "booking.ts" as Booking
+component "filter.ts" as Filter
+component "rooms.ts" as Rooms
+component "index.css" as Styles
+
+Main --> App : renders
+Main --> Styles : imports
+App --> Rooms : room catalog
+App --> Filter : filterRooms()
+App --> Booking : checkRoom(), isDayInterval()
+Filter ..> Rooms : Room type
+Booking ..> Rooms : Room and Interval types
+@enduml
