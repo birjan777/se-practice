@@ -1,24 +1,10 @@
 import { useState } from 'react';
-import { canBook } from './booking';
-
-type Interval = { start: number; end: number };
-type Room = { id: string; name: string; blocked: boolean; bookings: Interval[] };
-
-const ROOMS: Room[] = [
-  { id: 'a101', name: 'Room A-101', blocked: false, bookings: [{ start: 600, end: 660 }] },
-  { id: 'b204', name: 'Room B-204', blocked: false, bookings: [] },
-];
-
-const toMinutes = (value: string) => {
-  const [h, m] = value.split(':').map(Number);
-  return h * 60 + m;
-};
+import { ROOM, checkRoomAvailability } from './roomAvailability';
 
 const fmt = (m: number) =>
   `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
 export default function App() {
-  const [roomId, setRoomId] = useState('a101');
   const [now, setNow] = useState('09:00');
   const [blocked, setBlocked] = useState(false);
   const [start, setStart] = useState('11:00');
@@ -27,35 +13,12 @@ export default function App() {
   const [result, setResult] = useState<boolean | null>(null);
   const [error, setError] = useState('');
 
-  const room = ROOMS.find((r) => r.id === roomId)!;
-
   function check() {
-    setResult(null);
-
-    if (!start || !now || (!end && !endOfDay)) {
-      setError('Fill in the current time, the start and the end.');
-      return;
-    }
-
-    const s = toMinutes(start);
-    const e = endOfDay ? 1440 : toMinutes(end);
-    const n = toMinutes(now);
-
-    if (!(s < e)) {
-      setError('The end time must be after the start time.');
-    } else {
-      setError('');
-    }
-
-    const ok = canBook({
-      start: s,
-      end: e,
-      now: n,
-      blocked,
-      bookings: room.bookings,
+    const outcome = checkRoomAvailability({
+      start, end, now, endOfDay, blocked, bookings: ROOM.bookings,
     });
-
-    setResult(ok);
+    setError(outcome.error);
+    setResult(outcome.available);
   }
 
   return (
@@ -65,12 +28,8 @@ export default function App() {
       <div className="row">
         <label>
           Room
-          <select value={roomId} onChange={(e) => setRoomId(e.target.value)}>
-            {ROOMS.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
+          <select defaultValue={ROOM.id}>
+            <option value={ROOM.id}>{ROOM.name}</option>
           </select>
         </label>
 
@@ -125,8 +84,8 @@ export default function App() {
 
       <h2>Existing bookings</h2>
       <ul>
-        {room.bookings.length ? (
-          room.bookings.map((b, i) => (
+        {ROOM.bookings.length ? (
+          ROOM.bookings.map((b, i) => (
             <li key={i}>
               {fmt(b.start)}–{fmt(b.end)}
             </li>
