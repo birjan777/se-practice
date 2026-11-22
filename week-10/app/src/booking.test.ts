@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, it, expect } from 'vitest';
 import { canBook } from './booking';
 import App from './App';
+import { checkRoomAvailability } from './roomAvailability';
 
 describe('canBook function test suite (AC1–AC5)', () => {
   const DEFAULT_NOW = 540;
@@ -152,4 +153,20 @@ it('R2: the checker renders exactly one fictional room', () => {
 
   expect(page).toContain('Room A-101');
   expect(page.match(/<option\b/g)).toHaveLength(1);
+});
+
+it('R3: invalid intervals return only the validation error', () => {
+  for (const end of ['10:00', '11:00']) {
+    expect(checkRoomAvailability({
+      start: '11:00',
+      end,
+      now: '09:00',
+      endOfDay: false,
+      blocked: false,
+      bookings: [],
+    })).toEqual({
+      available: null,
+      error: 'The end time must be after the start time.',
+    });
+  }
 });

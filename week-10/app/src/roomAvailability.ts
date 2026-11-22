@@ -36,6 +36,10 @@ export function checkRoomAvailability({
 
   const startMinutes = toMinutes(start);
   const endMinutes = endOfDay ? 1440 : toMinutes(end);
+  if (!(startMinutes < endMinutes)) {
+    return { available: null, error: 'The end time must be after the start time.' };
+  }
+
   const available = canBook({
     start: startMinutes,
     end: endMinutes,
@@ -44,6 +48,5 @@ export function checkRoomAvailability({
     bookings,
   });
 
-  const error = startMinutes < endMinutes ? '' : 'The end time must be after the start time.';
-  return { available, error };
+  return { available, error: '' };
 }
