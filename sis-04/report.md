@@ -1,16 +1,5 @@
 # SIS #04 — Report: Evolving the Smart Campus Room Availability Checker
 
-<!-- The ONLY file you write prose in. Keep every numbered heading (## 1. … ## 10.), every
-     ### sub-heading and every **Label:** word — the checker finds your answers by them.
-     Replace every "(write here)" and " RUN  v3.2.7 /private/tmp/sis04-project.Vc4T8M/sis-04/app
-
- ✓ src/booking.test.ts (19 tests) 2ms
-
- Test Files  1 passed (1)
-      Tests  19 passed (19)
-   Start at  16:40:51
-   Duration  187ms (transform 25ms, setup 0ms, collect 19ms, tests 2ms, environment 0ms, prepare 40ms)". Delete these <!-- --> comments if you like. -->
-
 ## 1. Setup and starting point
 
 <!-- Model: the exact model with its version, as the tool shows it ("ChatGPT" is a tool, not a
@@ -24,7 +13,7 @@
 | Assistant (tool) | ChatGPT (web) |
 | Assistant model | not displayed |
 | Starting point | week-08 |
-| Baseline commit | (write here) |
+| Baseline commit | aea0c64 |
 | Language (ts or js) | ts |
 | Vitest version | 3.2.7 |
 | Where I ran the tests | Local macOS terminal in the SIS 04 checkout |
@@ -36,57 +25,84 @@
      "No test files found". That is your honest "original" number, 0/0. -->
 
 ```text
-(paste here)
+ RUN  v3.2.7 /private/tmp/sis04-project.Vc4T8M/sis-04/app
+
+ ✓ src/booking.test.ts (19 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  16:40:51
+   Duration  187ms (transform 25ms, setup 0ms, collect 19ms, tests 2ms, environment 0ms, prepare 40ms)
 ```
 
 ## 2. Context for the assistant
 
 ### 2.1 Repository map
 
-<!-- The concise map you gave the assistant: the files that matter and one line each on what
-     they do. A tree is fine:  src/App.tsx — the page, holds the rooms and the form … -->
-
 ```text
-(paste here)
+src/App.tsx — React form, inline room fixtures, selection, time parsing and feedback.
+src/booking.ts — canBook checks time, duration, blocking and overlap.
+src/booking.test.ts — 19 existing Vitest regression cases.
+src/index.css — layout and result styles.
+src/main.tsx and index.html — React and browser entry points.
+vite.config.ts, tsconfig.json and package.json — build and test setup.
 ```
 
 ### 2.2 The context message as sent
 
-<!-- The whole first message of your analysis chat: the map, AC1–AC6, F1–F5 and the constraints
-     (no login, payments, live APIs or database; fictional data only). Unedited. -->
-
 ```text
-(paste here)
+Review the baseline for SIS 04 in read-only mode. Use this one context message and give only analysis and a small numbered plan. No code or edits yet.
+
+Repository map
+- src/App.tsx: React form, two inline room fixtures, room selection, time parsing, feedback and existing bookings.
+- src/booking.ts: pure canBook function that checks time, duration, blocking and overlap.
+- src/booking.test.ts: existing Vitest regression tests.
+- src/index.css: layout and result styling.
+- src/main.tsx, index.html, vite.config.ts, tsconfig.json and package.json: application entry and tool setup.
+
+AC1: Reject start >= end and past requests. The baseline also rejects start equal to now.
+AC2: Accept at most 120 minutes.
+AC3: Reject blocked rooms.
+AC4: Reject overlap and allow slots that only touch at endpoints.
+AC5: Return availability without changing bookings.
+AC6: Keep clear responsive results on desktop and mobile.
+F1: Keep rooms with capacity >= attendees.
+F2: Keep rooms with ALL selected equipment.
+F3: A blocked room is never available.
+F4: Show a clear empty state if no room matches.
+F5: Switching rooms refreshes the result using that room's own bookings.
+
+Constraints: four or more fictional rooms with id, name, capacity, equipment, blocked and bookings. Fixed demo time. No login, payments, live APIs or database. Keep the canBook contract and add rooms.ts, filter.ts with filterRooms and booking.ts with checkRoom. Keep the existing tests.
+
+Baseline evidence from src/App.tsx: lines 7–10 put room data inside the UI. Lines 21–30 store roomId and a separate global blocked checkbox. Lines 32–58 parse times and call canBook with the checkbox but room.bookings. Line 68 changes only roomId. Lines 118–124 display error and result separately. src/booking.ts lines 18–24 already enforce valid times, 120 minutes, blocking and strict overlap.
+
+Name at least three maintainability risks with file/function evidence and priority, propose numbered test-first steps, and mention an optional UI choice with its trade-off. Please answer in English in at most 260 words.
 ```
 
 ## 3. Codebase analysis (Task 1)
 
 ### 3.1 Maintainability risks
 
-<!-- At least three, found in YOUR starting code. "Where" names a file or a function(),
-     e.g. src/App.tsx, check(). Evidence is what you saw, not what the assistant said.
-     Priority: High / Medium / Low. -->
-
 | # | Risk | Where (file / function) | Evidence | Priority |
 | --- | --- | --- | --- | --- |
-| 1 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 2 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 3 | (write here) | (write here) | (write here) | High / Medium / Low |
+| 1 | Catalog data is coupled to the view | `src/App.tsx:4–10` | The component defines the room type and two fixtures. They have bookings but no capacity or equipment for F1 and F2. | High |
+| 2 | Blocking applies across room selections | `src/App.tsx:23`, `check():50–56` | The call uses the global checkbox for `blocked` and the selected room for `bookings`. The checkbox ignores the selected room's own blocked value. | High |
+| 3 | Selection can leave a stale result | `src/App.tsx:68`, `check():58` | The selection handler changes only `roomId`. The old boolean persists when another room's bookings appear. | High |
+| 4 | Invalid times can display two messages | `src/App.tsx:44–58,118–124`, `src/booking.ts:18` | The view sets an error for the reversed interval and still passes it to `canBook`, which rejects it. Both messages can then render. | Medium |
 
 ### 3.2 Improvement plan — before editing
 
-<!-- Numbered, in the order you will do it, smallest safe step first. Written BEFORE you change
-     code: the commit that adds this section comes before the commit that changes app/src. -->
-
-1. (write here)
-2. (write here)
-3. (write here)
+1. Keep all 19 regression cases and mark their existing AC and boundary coverage in the titles.
+2. Add failing filter tests for exact capacity, one seat short, all selected equipment and zero matches. Move the demo catalog to `rooms.ts` and implement `filterRooms`.
+3. Add failing tests for a blocked room, different bookings for the same slot, an unknown room and the filter-to-booking flow. Implement `checkRoom` using the existing `canBook` rules.
+4. Connect the catalog and rules to the form. Keep the last checked slot so a room change immediately shows the correct result. Check the empty state, a blocked room, and feedback at desktop and phone widths.
+5. Compare the baseline and final modules, update the diagrams and run the full Vitest suite and both submission checks.
 
 ### 3.3 One AI suggestion I rejected or modified
 
 | Suggestion (as the assistant made it) | Decision | Why — with the AC, F-rule, test or file behind it |
 | --- | --- | --- |
-| (write here) | Rejected / Modified | (write here) |
+| “`filterRooms` against capacity, all selected equipment and blocked rooms.” | Modified | F1 and F2 determine the filtered list. F3 is enforced by `checkRoom`. A blocked room that meets the other criteria stays visible with a label and its availability check returns false. The follow-up design review supported this boundary. |
 
 ## 4. Feature extension (Task 2)
 
