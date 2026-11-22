@@ -8,7 +8,7 @@ student:
   github: "birjan777"
 
 assistant:
-  tool: "ChatGPT (web)"
+  tool: "Gemini"
   model: "not displayed"
 
 project:
@@ -25,11 +25,11 @@ counts:
   exchanges: 3
 
 checker:
-  pass: 32
-  fail: 1
+  pass: 33
+  fail: 0
   error: 0
-  commit: e17c6f2
-  known_fails: [L10]
+  commit: 7acc462
+  known_fails: [ ]
 
 review_findings:
   - "F2: The filter requires projector and whiteboard together. The F2 test verifies that a projector-only room is excluded."
