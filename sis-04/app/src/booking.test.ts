@@ -1,16 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { canBook } from './booking';
+import { canBook, checkRoom } from './booking';
+import { filterRooms } from './filter';
+import type { Room } from './rooms';
 
 describe('canBook function test suite (AC1–AC5)', () => {
   const DEFAULT_NOW = 540;
 
-  it('T01: 660–720 (touching after) should be allowed', () => {
+  it('T01 B3 AC4: 660–720 (touching after) should be allowed', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: false, bookings });
     expect(result).toBe(true);
   });
 
-  it('T02: 540–570 (starts now) should be rejected', () => {
+  it('T02 AC1: 540–570 (starts now) should be rejected', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 540, end: 570, now: 540, blocked: false, bookings });
     expect(result).toBe(false);
@@ -35,13 +37,13 @@ describe('canBook function test suite (AC1–AC5)', () => {
     expect(result).toBe(false);
   });
 
-  it('T06: 720–840 (120 minutes) should be allowed', () => {
+  it('T06 B1 AC2: 720–840 (120 minutes) should be allowed', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 720, end: 840, now: DEFAULT_NOW, blocked: false, bookings });
     expect(result).toBe(true);
   });
 
-  it('T07: 720–841 (121 minutes) should be rejected', () => {
+  it('T07 B2: 720–841 (121 minutes) should be rejected', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 720, end: 841, now: DEFAULT_NOW, blocked: false, bookings });
     expect(result).toBe(false);
@@ -53,7 +55,7 @@ describe('canBook function test suite (AC1–AC5)', () => {
     expect(result).toBe(true);
   });
 
-  it('T09: 630–690 (partial overlap) should be rejected', () => {
+  it('T09 B4: 630–690 (partial overlap) should be rejected', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 630, end: 690, now: DEFAULT_NOW, blocked: false, bookings });
     expect(result).toBe(false);
@@ -77,7 +79,7 @@ describe('canBook function test suite (AC1–AC5)', () => {
     expect(result).toBe(false);
   });
 
-  it('T13: 660–720, blocked = true should be rejected', () => {
+  it('T13 AC3: 660–720, blocked = true should be rejected', () => {
     const bookings = [{ start: 600, end: 660 }];
     const result = canBook({ start: 660, end: 720, now: DEFAULT_NOW, blocked: true, bookings });
     expect(result).toBe(false);
@@ -142,4 +144,40 @@ describe('canBook function test suite (AC1–AC5)', () => {
     expect(bookings).toEqual(before);
   });
 
+});
+
+describe('room-specific availability', () => {
+  const rooms: Room[] = [
+    { id: 'free', name: 'Free', capacity: 8, equipment: ['projector'], blocked: false, bookings: [] },
+    {
+      id: 'busy',
+      name: 'Busy',
+      capacity: 12,
+      equipment: ['projector', 'whiteboard'],
+      blocked: false,
+      bookings: [{ start: 630, end: 690 }],
+    },
+    { id: 'blocked', name: 'Blocked', capacity: 8, equipment: ['projector'], blocked: true, bookings: [] },
+  ];
+  const request = { start: 600, end: 660, now: 540 };
+
+  it('F3: a blocked room is unavailable even with no bookings', () => {
+    expect(checkRoom(rooms, 'blocked', request)).toBe(false);
+  });
+
+  it('F5: the same slot can be free in one room and busy in another', () => {
+    expect(checkRoom(rooms, 'free', request)).toBe(true);
+    expect(checkRoom(rooms, 'busy', request)).toBe(false);
+  });
+
+  it('an unknown room is unavailable', () => {
+    expect(checkRoom(rooms, 'missing', request)).toBe(false);
+  });
+
+  it('INT: the filtered room is checked against its own bookings', () => {
+    const matches = filterRooms(rooms, { attendees: 8, equipment: ['whiteboard'] });
+    expect(matches.map((room) => room.id)).toEqual(['busy']);
+    expect(checkRoom(matches, matches[0].id, request)).toBe(false);
+    expect(matches[0].bookings).toEqual([{ start: 630, end: 690 }]);
+  });
 });
