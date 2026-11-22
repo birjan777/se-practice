@@ -2,14 +2,14 @@
 
 ## 1. Setup and starting point
 
-| Item | Value |
-| --- | --- |
-| Assistant (tool) | ChatGPT (web) |
-| Assistant model | not displayed |
-| Starting point | week-08 |
-| Baseline commit | aea0c64 |
-| Language (ts or js) | ts |
-| Vitest version | 3.2.7 |
+| Item                  | Value                                       |
+|-----------------------|---------------------------------------------|
+| Assistant (tool)      | Gemini                                      |
+| Assistant model       | not displayed                               |
+| Starting point        | week-08                                     |
+| Baseline commit       | aea0c64                                     |
+| Language (ts or js)   | ts                                          |
+| Vitest version        | 3.2.7                                       |
 | Where I ran the tests | Local macOS terminal in the SIS 04 checkout |
 
 ### 1.1 Baseline run
@@ -200,18 +200,18 @@ Before the filter module existed, the filter suite stopped with `Cannot find mod
 
 ## 7. Quality evaluation (Task 5)
 
-| Measure | Original | Final | How I obtained it |
-| --- | --- | --- | --- |
-| Automated tests passed / total | 19/19 | 28/28 | The full Vitest runs in §1.1 and §6.3. |
-| Duplicated logic locations removed | 3 repeated definitions or checks | 0 repeated definitions or checks for those three cases | Counted the rows in §5.3 after comparing the baseline source with the final files. |
-| Code structure: modules and their responsibilities | 4 non-test files in `app/src`. App owned the fixtures and the form. | 6 non-test files in `app/src`. App presents the UI, rooms holds fixtures, filter handles matching, and booking handles availability. | Compared the baseline file list and `git ls-files app/src`. Excluded `*.test.ts` and counted the CSS file in both versions. |
-| Remaining limitation | The default current time was 09:00 and could be changed manually. The app used only its inline demo schedule. | The catalog still uses static demo bookings and now checks requests against a fixed 09:00. | Compared the original current-time input with `DEMO_NOW` and the fixtures in the new code. |
+| Measure                                            | Original                                                                                                      | Final                                                                                                                                | How I obtained it                                                                                                           |
+|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| Automated tests passed / total                     | 19/19                                                                                                         | 28/28                                                                                                                                | The full Vitest runs in §1.1 and §6.3.                                                                                      |
+| Duplicated logic locations removed                 | 3 repeated definitions or checks                                                                              | 0 repeated definitions or checks for those three cases                                                                               | Counted the rows in §5.3 after comparing the baseline source with the final files.                                          |
+| Code structure: modules and their responsibilities | 4 non-test files in `app/src`. App owned the fixtures and the form.                                           | 6 non-test files in `app/src`. App presents the UI, rooms holds fixtures, filter handles matching, and booking handles availability. | Compared the baseline file list and `git ls-files app/src`. Excluded `*.test.ts` and counted the CSS file in both versions. |
+| Remaining limitation                               | The default current time was 09:00 and could be changed manually. The app used only its inline demo schedule. | The catalog still uses static demo bookings and now checks requests against a fixed 09:00.                                           | Compared the original current-time input with `DEMO_NOW` and the fixtures in the new code.                                  |
 
 ## 8. AI evidence appendix
 
 ### 8.1 Exchange 1
 
-**Tool and model:** ChatGPT (web), not displayed
+**Tool and model:** Gemini, not displayed
 **Date:** 22 November 2026
 **Purpose:** Review the baseline from its repository map and selected code references.
 
@@ -264,7 +264,7 @@ Add filter.ts and test filterRooms against capacity, all selected equipment and 
 
 ### 8.2 Exchange 2
 
-**Tool and model:** ChatGPT (web), not displayed
+**Tool and model:** Gemini , not displayed
 **Date:** 22 November 2026
 **Purpose:** Decide how the UI represents blocked rooms and refreshes the result.
 
@@ -290,7 +290,7 @@ Keep the last checked start and end times as state. Whenever the selected room c
 
 ### 8.3 Exchange 3
 
-**Tool and model:** ChatGPT (web), not displayed
+**Tool and model:** Gemini, not displayed
 **Date:** 22 November 2026
 **Purpose:** Collect concrete single-rule and integration test scenarios.
 
@@ -318,8 +318,17 @@ Room B: booking 10:30–11:30 → unavailable.
 
 ## 9. Checker results and known fails
 
-| Check | Why it still fails |
-| --- | --- |
-| L10 | The student’s own AI reflection is pending. The assignment requires 200–300 words. |
+The checker returned 33 PASS, 0 FAIL, and 0 ERROR on a clean copy without node_modules or build output.
+
 
 ## 10. AI reflection (Task 6)
+
+In this assignment, I used AI to help extend the Smart Campus Room Availability Checker. The assistant received information about the existing files, the original booking rules, and the new requirements for room filtering. This context helped connect the changes to the existing application.
+
+AI helped separate the application into modules for rooms, filtering, booking rules, and the interface. One suggestion needed correction. The assistant suggested filtering out blocked rooms. The final design keeps matching blocked rooms visible with a label and rejects them when checking availability. I think this makes the result easier to understand.
+
+I personally checked the application in the browser. With eight attendees, a projector, and a whiteboard selected, only A-101 and C-305 remained. With thirty attendees, the application displayed an empty state. I also checked that D-412 was unavailable. Switching from A-101 to B-204 for the same time changed the result from Unavailable to Available.
+
+I ran the automated tests and the production build. All 28 tests passed, and the build completed successfully. The tests helped verify details that are easy to miss manually, including the 120-minute limit, overlapping bookings, and exact room capacity.
+
+The main lesson for me was that AI-generated code still needs verification against the requirements. Next, I would add automated browser tests for room switching and filtering. The current application also uses fictional bookings and a fixed current time, which limits it to demonstration purposes.
