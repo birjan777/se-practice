@@ -1,14 +1,14 @@
-# Week 10 declaration. Counts reflect the checked commit below.
+# Week 10 submission
 schema: 1
 week: "10"
 
 student:
-  name: "birjan777"
-  student_id: "withheld"  # Omitted from the public-repository draft. D3 is expected.
+  name: "Khalenov Birzhan"
+  student_id: "25B030042"
   github: "birjan777"
 
 assistant:
-  tool: "ChatGPT"
+  tool: "Gemini"
   model: "not displayed"
   environment: chat
 
@@ -23,7 +23,7 @@ counts:
   risks_registered: 6
   risks_confirmed: 6
   tests_final: 21
-  agents_lines_changed: 0
+  agents_lines_changed: 8
 
 audit:
   level: 0
@@ -34,20 +34,20 @@ decision:
   release: no-go
 
 checker:
-  pass: 18
-  fail: 11
-  error: 2
-  commit: aeece1e
-  known_fails: [A2, A3, C1, C2, C3, C4, C5, C6, E1, E2, L9, L10, L13]
+  pass: 31
+  fail: 0
+  error: 0
+  commit: 7311de2
+  known_fails: []
 
 review_findings:
-  - "AC4: the reviewer treated endpoint touching as a violation, but the lab contract and the baseline T01/T08/BUG-A tests allow it."
-  - "R2: the baseline App rendered two room options, and the same regression test observes one after extraction."
-  - "R3: the old invalid interval path produced Unavailable alongside the error. The final evaluator returns only the validation error."
-  - "AGENTS.md: test:unit is missing from package.json, and the real Vitest command passed."
+  - "The reviewer said that AC4 rejects bookings that touch at an endpoint. The assignment and the tests allow them."
+  - "The R2 test found two room options before the fix. After the fix, it found one."
+  - "For R3, the old code could show both an error and Unavailable. The fixed app shows only the error."
+  - "AGENTS.md listed npm run test:unit, but package.json has no test:unit script. The tests passed with npx vitest run."
 
 honesty:
   review_was_read_only: yes
-  agents_patch_approved_by_me: no
+  agents_patch_approved_by_me: yes
   outputs_unedited: yes
   ai_usage_disclosed: yes
