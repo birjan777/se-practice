@@ -13,14 +13,14 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 | | |
 | --- | --- |
-| Assistant I built the feature with (tool) |Codex |
-| Its exact model (with its version, or `not displayed`) |not displayed |
-| Assistant I reviewed with (tool) |Codex, separate review conversation |
-| Its exact model (with its version, or `not displayed`) |not displayed |
-| Starting point (`week-10` or `week-08`) |week-10 |
-| Baseline commit — the checkpoint of Part 0 |91783e9 |
-| Where I ran the tests (Bolt terminal / my computer / Codespace) |Local macOS terminal, with a clean test copy in /tmp |
-| Vitest version (the `RUN  v…` line of a run) |3.2.7 |
+| Assistant I built the feature with (tool) | Codex |
+| Its exact model (with its version, or `not displayed`) | not displayed |
+| Assistant I reviewed with (tool) | Codex, separate review conversation |
+| Its exact model (with its version, or `not displayed`) | not displayed |
+| Starting point (`week-10` or `week-08`) | week-10 |
+| Baseline commit — the checkpoint of Part 0 | 91783e9 |
+| Where I ran the tests (Bolt terminal / my computer / Codespace) | Local macOS terminal, with a clean test copy in /tmp |
+| Vitest version (the `RUN  v…` line of a run) | 3.2.7 |
 
 ---
 
@@ -116,38 +116,45 @@ Student request -> validation -> availabilityReason / canBook decides -> mockAda
 
 ### 4.1 The implementation prompt and the answer
 
-What you sent, exactly (the deck's prompt, and the contract if you sent it):
-
 ```text
-(paste here)
+Act as a software engineer. Extend the existing Smart Campus checker with an optional explanation feature. Preserve all booking rules and tests. The deterministic checker must remain authoritative. First, implement a mock adapter, validate inputs and outputs, handle failures gracefully, and describe each changed file. Do not add login, a database, real personal data, or client-side API secrets.
 ```
 
-The assistant's answer, pasted unedited (its description of each changed file is enough if the code
-is long):
+The builder also received the project path and references to the README contract, the report contract and app/AGENTS.md. Its reply follows.
 
 ```text
-(paste here)
+Implemented the optional **Explain availability** feature. The deterministic checker decides availability once. The mock explains that result, and a timeout, adapter error, or unverified answer produces a labelled local fallback.
+
+| Changed file | What changed |
+| --- | --- |
+| `src/booking.ts` | Added `availabilityReason` with the six required reason codes. `canBook` uses the same rules in their original order. |
+| `src/roomAvailability.ts` | Returns the reason alongside each completed check and preserves the existing validation feedback for invalid intervals. |
+| `src/explain.ts` | Added input validation, the offline `mockAdapter`, a 1,500 ms timeout, output validation, and reason-based fallback text. The validator accepts a limited set of grounded sentence forms, so other wording can trigger a fallback even when accurate. |
+| `src/App.tsx` | Added the explanation button, simulated failure control, and separate labels for confirmed status, generated text, and fallback text. The checked request records `24:00` when selected. Editing or rechecking clears stale results and prevents late responses from appearing. |
+| `src/index.css` | Styled the explanation separately from the confirmed status and kept the controls usable on narrow screens. |
+
+All **30 tests passed**, including the **21 original booking tests**, and the production build passed. Browser interaction verification remains with the parent task.
 ```
 
 ### 4.2 Every changed file, decided
 
-**Decision:** `accept`, `modify` or `reject`.
+These decisions document the implementation review by Codex. The student’s independent review is pending.
 
 | File | What the assistant changed | Decision | Why |
 | --- | --- | --- | --- |
-| | | | |
-| | | | |
-| | | | |
+| src/booking.ts | Extracted the reason function. | accept | All 21 original tests still pass. The same comparisons run in the same order. |
+| src/roomAvailability.ts | Returns the reason with a valid result. | accept | Invalid requests retain the Week 10 error shape. |
+| src/explain.ts | Added validation, timeout, mock and fallback. | modify | V1 and V2 exposed cases the initial validator mishandled. |
+| src/App.tsx | Added explain and failure controls. | accept | The async result only updates explanation state. Editing the form invalidates old requests. |
+| src/index.css | Separated the explanation visually. | accept | The section uses distinct spacing and permits controls to wrap. |
 
 ### 4.3 The adapter
 
-| | |
+|  |  |
 | --- | --- |
-| The mock adapter (its name in `explain.ts`) | |
-| The timeout (milliseconds) | |
-| A real-model adapter too? (`no`, or `yes` and where it runs, and where its key lives) | |
-
----
+| The mock adapter | mockAdapter |
+| The timeout | 1500 ms |
+| A real-model adapter too? | no |
 
 ## 5. Task 4 — prompt engineering
 
@@ -217,149 +224,190 @@ B explicitly identifies an existing booking in the overlap case. All three keep 
 
 ### 6.1 The test cases
 
-**Verdict:** `pass`, `fail` or `not run`. **How:** the Vitest test title, or `manual` and what you did.
-
 | ID | Case | Expected | Observed | Verdict | How |
 | --- | --- | --- | --- | --- | --- |
-| E1 | available | | | | |
-| E2 | overlap | | | | |
-| E3 | blocked room | | | | |
-| E4 | invalid time | | | | |
-| E5 | past time | | | | |
-| E6 | empty input | | | | |
-| E7 | long input | | | | |
-| E8 | timeout | | | | |
-| E9 | simulated API failure | | | | |
-| UI | the UI never changes the deterministic decision | | | | |
+| E1 | available | Available at the touching boundary | Generated available explanation | pass | E1 F1: a request touching the end of a booking is available |
+| E2 | overlap | Unavailable due to overlap | Unavailable and overlap in the explanation | pass | E2 F2: an overlap explains the unavailable decision |
+| E3 | blocked room | Blocked reason | Blocked reason and matching text | pass | E3 F2: a blocked room is explained by the blocked-room rule |
+| E4 | invalid time | Invalid interval reason | invalid_time and generated response | pass | E4 F2: a reversed interval has the invalid_time reason |
+| E5 | past time | Past start reason | past_time and generated response | pass | E5 F2: an earlier start has the past_time reason |
+| E6 | empty input | Reject before adapter | Rejected; zero calls | pass | E6 F3: a blank room label is rejected before the adapter runs |
+| E7 | long input | Reject before adapter | 500 characters rejected; zero calls | pass | E7 F3: a 500-character label is rejected before the adapter runs |
+| E8 | timeout | Fallback at 40 ms | Unresolved at 39 ms; fallback at 40 ms | pass | E8 F4: an unanswered request falls back at the timeout |
+| E9 | simulated API failure | Local fallback; status preserved | Available fallback after throw | pass | E9 F4: a throwing adapter uses the local reason and preserves status |
+| UI | UI never changes the deterministic decision | Confirmed status stays visible in both modes | Source inspected; browser interaction still pending | not run | Pending direct browser check |
 
 ### 6.2 The run after the feature
 
-The real output of `npx vitest run` with `explain.test.ts` in place (before the review fixes):
-
 ```text
-(paste here)
+
+ RUN  v3.2.7 /private/tmp/birjan-practice11-evidence/week-11/app
+
+ ✓ src/explain.test.ts (9 tests) 4ms
+ ✓ src/booking.test.ts (21 tests) 5ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  13:05:49
+   Duration  209ms (transform 54ms, setup 0ms, collect 83ms, tests 10ms, environment 0ms, prepare 78ms)
 ```
 
 ### 6.3 Screenshots
 
 | File | What it shows |
 | --- | --- |
-| `evidence/explain-available.png` | |
-| `evidence/explain-fallback.png` | |
-
----
+| `evidence/explain-available.png` | Pending capture of the generated explanation alongside Available. |
+| `evidence/explain-fallback.png` | Pending capture of the same decision after simulated failure. |
 
 ## 7. Task 6 — the agentic code review
 
 ### 7.1 The reviewer and its context
 
-Where it ran, how you made sure it could not edit, and what you gave it (the diff, README,
-`AGENTS.md`, the criteria):
-
-<!-- Write below this line -->
+The separate Codex review used the checkpoint and feature commit as references. Its execution session was unavailable. It received the booking and explanation source, the UI logic and a description of the JSX changes, the E1–E9 tests, README criteria F1–F5 and AGENTS.md criteria AC1–AC6 in chat. The diff was supplied in excerpts. The reviewer only returned text and made no edits.
 
 ### 7.2 The review prompt and the answer
 
-What you sent, exactly (the deck's prompt):
-
 ```text
-(paste here)
+Act as a read-only agentic code reviewer. Inspect the proposed diff in context, repository instructions, and tests. Review correctness, security, maintainability, and performance. For each issue, provide severity, affected file, evidence, reproduction or verification method, and a minimal recommendation. Do not edit files. Clearly distinguish confirmed findings from hypotheses.
 ```
 
-The reviewer's answer, pasted unedited:
-
 ```text
-(paste here)
+I reviewed the supplied diff content, the Week 10 booking criteria, F1–F5 and E1–E9. The booking refactor preserves the original comparisons and their order. The UI keeps the confirmed status separate and checks a request ID before displaying an asynchronous answer. I made no edits. The findings below are confirmed by inspection. The proposed tests still need to be run.
+
+| ID | Severity and file | Evidence and verification | Minimal fix |
+| --- | --- | --- | --- |
+| V1 | Medium · `src/explain.ts` | `validateInput` accepts `12:30–12:00` with `isAvailable=true` and `reasonCode="available"`. Both times pass individual format checks. Use a spy adapter and verify this inconsistent request rejects before the adapter runs. E4’s reversed interval with `invalid_time` should still work. | Reject a reversed or zero-length interval paired with any reason other than `invalid_time`. |
+| V2 | Medium · `src/explain.ts` | All three recorded prompt B answers begin with “Room A-101”. The validator accepts only statements beginning with “The room”. Replay the three exact responses through fake adapters and check whether the source is `generated`. | Accept the measured B response forms using the supplied label, times and reason. Retain whole-statement matching to reject invented details. |
+| V3 | Low · `src/explain.test.ts` | E8 and E9 cover timeout and error. None of E1–E9 exercises a successful adapter response with a contradictory status or an invented time. | Add both cases and assert the fallback source and original decision. |
+| V4 | Low · `src/explain.ts` | The supplied pre-fix module lacks `SYSTEM_INSTRUCTION`, which Part 4 requires. Check the final revision for the export and compare its value with prompt B in the report. | Export the chosen instruction verbatim. |
+
+I would prioritise V1 and V2. The first can produce a generated explanation for an impossible availability claim. The second prevents even the experiment’s accurate answers from being displayed as generated.
 ```
 
 ### 7.3 The findings, verified
 
-At least **three**; at least **two** `confirmed`. **Category:** `correctness`, `security`,
-`maintainability`, `performance` or `tests`. **Severity:** `high`, `medium` or `low`. **Found by:**
-`reviewer`, `me` or `both`.
+Verification below was performed by Codex. Student verification is pending.
 
 | ID | Finding (short) | Category | Severity | File | How I verified it | Label | Found by |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V1 | | | | | | | |
-| V2 | | | | | | | |
-| V3 | | | | | | | |
+| V1 | Available with impossible interval | correctness | medium | src/explain.ts | The V1 test failed before f22a28a: the promise resolved generated instead of rejecting. It passed after the fix. | confirmed | reviewer |
+| V2 | Grounded B outputs rejected | correctness | medium | src/explain.ts | Replayed the three B samples. The first Vitest assertion expected generated and received fallback. All three pass after 43fcdb1. | confirmed | reviewer |
+| V3 | Missing successful-but-invalid output tests | tests | low | src/explain.test.ts | Read every original E1–E9 adapter fixture. V3 now checks contradictory status and invented time. | confirmed | reviewer |
+| V4 | Selected instruction missing from feature snapshot | maintainability | low | src/explain.ts | Compared 2462c9f with 5d8b3e7. The latter exports the recorded instruction. | confirmed | reviewer |
 
 ### 7.4 My own inspection, and the linter
 
-What you checked by hand that the reviewer did not, and which of these findings a linter would have
-caught and which it could not:
-
-<!-- Write below this line -->
-
----
+Codex compared the committed booking test file with the checkpoint and verified that the provided checker and validator match the teaching archive byte for byte. A linter could check syntax. It would need project-specific knowledge to detect the disagreement between prompt B and the permitted explanation wording. Independent student inspection is pending.
 
 ## 8. Task 7 — repair and regression-test
 
 ### 8.1 The first fix
 
-**Finding:** V?
+**Finding:** V1
 
-**Why it is necessary:**
+**Why it is necessary:** An impossible interval could pass the adapter boundary as an available booking. The original booking decision and its precedence must survive validation.
 
-**What I rejected from the assistant's proposal, and why:**
+**What I rejected from the assistant's proposal, and why:** Kept the recommendation and also checked the 120-minute boundary and the priority of past_time.
 
-The diff (`git diff`):
+The diff (production code; regression tests are in the same commit)
 
 ```text
-(paste here)
+diff --git a/week-11/app/src/explain.ts b/week-11/app/src/explain.ts
+index dc09c5d..3ebc0d9 100644
+--- a/week-11/app/src/explain.ts
++++ b/week-11/app/src/explain.ts
+@@ -47,6 +47,13 @@ function validateInput(value: unknown): ExplainInput {
+       isAvailable !== (reasonCode === 'available')) {
+     throw new Error('The availability status and reason must match the checker.');
+   }
++  const minutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
++  const duration = minutes(end) - minutes(start);
++  if ((duration <= 0) !== (reasonCode === 'invalid_time') ||
++      (reasonCode === 'too_long' && duration <= 120) ||
++      (duration > 120 && reasonCode !== 'past_time' && reasonCode !== 'too_long')) {
++    throw new Error('The interval and reason must match the checker.');
++  }
+   return Object.freeze({ roomLabel: label, start, end, isAvailable, reasonCode });
+ }
+ 
 ```
 
 ### 8.2 The second fix
 
-**Finding:** V?
+**Finding:** V2
 
-**Why it is necessary:**
+**Why it is necessary:** The chosen prompt produced factually correct answers that were consistently replaced by fallback. The validator must recognise these measured responses.
 
-**What I rejected from the assistant's proposal, and why:**
+**What I rejected from the assistant's proposal, and why:** Kept the whole-sentence comparison and restricted named-room wording to identifiers. A status keyword alone would accept incorrect explanations.
 
-The diff (`git diff`):
+The diff (production code; regression tests are in the same commit)
 
 ```text
-(paste here)
+diff --git a/week-11/app/src/explain.ts b/week-11/app/src/explain.ts
+index 3ebc0d9..ecd5901 100644
+--- a/week-11/app/src/explain.ts
++++ b/week-11/app/src/explain.ts
+@@ -75,12 +75,20 @@ function validateOutput(output: unknown, input: ExplainInput): string | undefine
+   // negations, invented details and instructions hidden after a correct status.
+   const normalized = text.toLowerCase();
+   const status = statusSentence(input).toLowerCase();
+-  const reason = reasonFacts[input.reasonCode];
++  // The mock uses "the room". The chosen prompt can also use a room identifier.
++  const subjects = [status];
++  if (/^Room [a-z0-9-]{1,32}$/i.test(input.roomLabel)) {
++    subjects.push(status.replace('the room', input.roomLabel.toLowerCase()));
++  }
++  const reasons = [reasonFacts[input.reasonCode]];
++  if (input.reasonCode === 'overlap') reasons.push('the requested time overlaps with another booking');
+   const slot = ` from ${input.start} to ${input.end}`;
+-  for (const statement of [status, status + slot]) {
+-    if (normalized === `${statement} because ${reason}.` ||
+-        normalized === `${statement}. ${reason}.` ||
+-        (input.isAvailable && normalized === `${statement}.`)) return text;
++  for (const subject of subjects) {
++    for (const statement of [subject, subject + slot]) {
++      if (input.isAvailable && normalized === `${statement}.`) return text;
++      if (reasons.some(reason => normalized === `${statement} because ${reason}.` ||
++          normalized === `${statement}. ${reason}.`)) return text;
++    }
+   }
+ }
+ 
 ```
 
 ### 8.3 The final run
 
-The real output of the **full** suite after both fixes: the old booking tests and the feature tests
-together. Every test must pass.
-
 ```text
-(paste here)
+
+ RUN  v3.2.7 /private/tmp/birjan-practice11-evidence/week-11/app
+
+ ✓ src/explain.test.ts (12 tests) 6ms
+ ✓ src/booking.test.ts (21 tests) 5ms
+
+ Test Files  2 passed (2)
+      Tests  33 passed (33)
+   Start at  13:32:03
+   Duration  256ms (transform 64ms, setup 0ms, collect 97ms, tests 11ms, environment 0ms, prepare 77ms)
 ```
 
 ### 8.4 Ready for demonstration?
 
-**Ready:** yes / no
+**Ready:** no
 
 **What remains unresolved:**
 
-<!-- Write below this line -->
-
----
+The full suite and build pass. The live UI demonstration, both screenshots and the student’s verification remain pending.
 
 ## 9. Checks I am keeping as FAIL or ERROR
 
-Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run is clean.
-
 | Check | Why it stays |
 | --- | --- |
-| | |
-
----
+| E1 | The available-state screenshot has not been captured. |
+| E2 | The fallback screenshot has not been captured. |
+| L7 | The nine automated cases pass. The browser interaction row is still pending. |
+| L12 | The course requires the student to write the reflection independently. |
 
 ## 10. Reflection
 
-<!-- 80-150 words, in your own words, without the assistant: what the AI generated, what you
-     verified, and what you changed. Name at least one finding ID (V1...) and one test ID (E1...).
-     Worthless: "AI helped me build the feature faster and the review was useful."
-     Worth everything: "Bolt wrote explain.ts and put a fetch to the OpenAI API in App.tsx with a
-     VITE_ key; I rejected that file and kept the mock (X4). The reviewer's V3, 'prompt injection
-     through roomLabel', was unsupported: the label comes from a fixed list. E8 failed at first
-     because the timeout was never armed; V1 was confirmed by a test that failed before the fix." -->
+<!-- Write 80–150 words independently, referencing at least one finding ID and one E-series test. -->
 
-<!-- Write your reflection below this line -->
