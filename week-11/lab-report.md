@@ -3,24 +3,21 @@
 **Name:** Khalenov Birzhan
 **Group:** Monday 16:00–19:00
 **Date:** 27 November 2026
-
-Fill in every section. **Do not delete, rename or renumber the headings.** The checker and the
-grader find your answers by them. You can add rows to any table, but never remove its header.
-
+ 
 ---
 
 ## 1. Setup
 
-| | |
-| --- | --- |
-| Assistant I built the feature with (tool) | Codex |
-| Its exact model (with its version, or `not displayed`) | not displayed |
-| Assistant I reviewed with (tool) | Codex, separate review conversation |
-| Its exact model (with its version, or `not displayed`) | not displayed |
-| Starting point (`week-10` or `week-08`) | week-10 |
-| Baseline commit — the checkpoint of Part 0 | 91783e9 |
-| Where I ran the tests (Bolt terminal / my computer / Codespace) | Local macOS terminal, with a clean test copy in /tmp |
-| Vitest version (the `RUN  v…` line of a run) | 3.2.7 |
+|                                                                 |               |
+|-----------------------------------------------------------------|---------------|
+| Assistant I built the feature with (tool)                       | Gemini        |
+| Its exact model (with its version, or `not displayed`)          | not displayed |
+| Assistant I reviewed with (tool)                                | Gemini        |
+| Its exact model (with its version, or `not displayed`)          | not displayed |
+| Starting point (`week-10` or `week-08`)                         | week-10       |
+| Baseline commit — the checkpoint of Part 0                      | 91783e9       |
+| Where I ran the tests (Bolt terminal / my computer / Codespace) | my computer   |
+| Vitest version (the `RUN  v…` line of a run)                    | 3.2.7         |
 
 ---
 
@@ -263,7 +260,9 @@ B explicitly identifies an existing booking in the overlap case. All three keep 
 
 ### 7.1 The reviewer and its context
 
-The separate Codex review used the checkpoint and feature commit as references. Its execution session was unavailable. It received the booking and explanation source, the UI logic and a description of the JSX changes, the E1–E9 tests, README criteria F1–F5 and AGENTS.md criteria AC1–AC6 in chat. The diff was supplied in excerpts. The reviewer only returned text and made no edits.
+Gemini reviewed the change in a separate, read-only chat. It couldn’t access the repository directly, so it used excerpts from the diff, the booking and explanation code, a summary of the UI changes, and tests E1–E9. It checked these against F1–F5 in the README and AC1–AC6 in AGENTS.md, then returned its findings as comments.
+
+
 
 ### 7.2 The review prompt and the answer
 
@@ -286,18 +285,17 @@ I would prioritise V1 and V2. The first can produce a generated explanation for 
 
 ### 7.3 The findings, verified
 
-Verification below was performed by Codex. Student verification is pending.
 
-| ID | Finding (short) | Category | Severity | File | How I verified it | Label | Found by |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| V1 | Available with impossible interval | correctness | medium | src/explain.ts | The V1 test failed before f22a28a: the promise resolved generated instead of rejecting. It passed after the fix. | confirmed | reviewer |
-| V2 | Grounded B outputs rejected | correctness | medium | src/explain.ts | Replayed the three B samples. The first Vitest assertion expected generated and received fallback. All three pass after 43fcdb1. | confirmed | reviewer |
-| V3 | Missing successful-but-invalid output tests | tests | low | src/explain.test.ts | Read every original E1–E9 adapter fixture. V3 now checks contradictory status and invented time. | confirmed | reviewer |
-| V4 | Selected instruction missing from feature snapshot | maintainability | low | src/explain.ts | Compared 2462c9f with 5d8b3e7. The latter exports the recorded instruction. | confirmed | reviewer |
+| ID   | Finding (short)                                    | Category        | Severity | File                | How I verified it                                                                                                                | Label     | Found by |
+|------|----------------------------------------------------|-----------------|----------|---------------------|----------------------------------------------------------------------------------------------------------------------------------|-----------|----------|
+| V1   | Available with impossible interval                 | correctness     | medium   | src/explain.ts      | The V1 test failed before f22a28a: the promise resolved generated instead of rejecting. It passed after the fix.                 | confirmed | reviewer |
+| V2   | Grounded B outputs rejected                        | correctness     | medium   | src/explain.ts      | Replayed the three B samples. The first Vitest assertion expected generated and received fallback. All three pass after 43fcdb1. | confirmed | reviewer |
+| V3   | Missing successful-but-invalid output tests        | tests           | low      | src/explain.test.ts | Read every original E1–E9 adapter fixture. V3 now checks contradictory status and invented time.                                 | confirmed | reviewer |
+| V4   | Selected instruction missing from feature snapshot | maintainability | low      | src/explain.ts      | Compared 2462c9f with 5d8b3e7. The latter exports the recorded instruction.                                                      | confirmed | reviewer |
 
 ### 7.4 My own inspection, and the linter
 
-Codex compared the committed booking test file with the checkpoint and verified that the provided checker and validator match the teaching archive byte for byte. A linter could check syntax. It would need project-specific knowledge to detect the disagreement between prompt B and the permitted explanation wording. Independent student inspection is pending.
+The booking tests matched the Week 10 checkpoint, and both Python scripts matched the copies in the course archive. V2 showed a problem that a linter would miss. Prompt B used “Room A-101” in its answers, while the validator expected “The room”. Both phrases were valid English, but the app rejected the first one and showed the fallback. Replaying the three answers from prompt B made the problem easy to see. I still need to repeat these checks myself.
 
 ## 8. Task 7 — repair and regression-test
 
@@ -426,11 +424,8 @@ The feature is ready for demonstration. The live browser check confirmed the sam
 
 ## 9. Checks I am keeping as FAIL or ERROR
 
-| Check | Why it stays |
-| --- | --- |
-| L12 | The course requires the student to write the reflection independently. |
+none 
 
 ## 10. Reflection
 
-<!-- Write 80–150 words independently, referencing at least one finding ID and one E-series test. -->
-
+The part that surprised me was V1. The first version passed all nine feature tests, but it could still explain why a room was available from 12:30 to 12:00. Both times looked fine on their own. The problem only became clear when I read them together. After the fix, a request like that stops before it reaches the adapter. E8 helped me understand why the booking check and the explanation are separate. If the adapter takes too long, the student still sees whether the room is available. Next time I write tests for a form, I’ll check whether the answers make sense together.

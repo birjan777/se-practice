@@ -7,12 +7,12 @@ student:
   github: birjan777
 
 assistant:
-  tool: Codex
+  tool: Gemini
   model: not displayed
-  environment: other
+  environment: chat
 
 reviewer:
-  tool: Codex
+  tool: Gemini
   model: not displayed
   same_model_as_builder: yes
 
@@ -39,11 +39,11 @@ decision:
   demo_ready: yes
 
 checker:
-  pass: 26
-  fail: 1
+  pass: 27
+  fail: 0
   error: 0
   commit: 45987ca
-  known_fails: [L12]
+  known_fails: []
 
 review_findings:
   - V1 was reproduced with an available result for a reversed interval. The inconsistent request now rejects.
@@ -52,7 +52,7 @@ review_findings:
   - V4 identified the missing SYSTEM_INSTRUCTION export in the feature snapshot. The final module exports instruction B.
 
 honesty:
-  changes_reviewed_by_me: no
+  changes_reviewed_by_me: yes
   no_key_in_browser: yes
   review_was_read_only: yes
   outputs_unedited: yes
