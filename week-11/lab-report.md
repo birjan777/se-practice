@@ -332,6 +332,32 @@ index dc09c5d..3ebc0d9 100644
  
 ```
 
+The follow-up shares the same maximum duration between the checker and input validation. This keeps a future rule change consistent across both modules.
+
+```diff
+diff --git a/week-11/app/src/booking.ts b/week-11/app/src/booking.ts
+index 2e486ec..5fd81d6 100644
+--- a/week-11/app/src/booking.ts
++++ b/week-11/app/src/booking.ts
+@@ -8,13 +8,15 @@ type CanBookInput = {
+   bookings: Interval[];
+ };
+ 
++export const MAX_BOOKING_MINUTES = 120;
++
+ export type ReasonCode =
+   | 'invalid_time' | 'past_time' | 'too_long' | 'room_blocked' | 'overlap' | 'available';
+ 
+ export function availabilityReason({ start, end, now, blocked, bookings }: CanBookInput): ReasonCode {
+   if (!(0 <= start && start < end && end <= 1440)) return 'invalid_time';
+   if (!(start > now)) return 'past_time';
+-  if (end - start > 120) return 'too_long';
++  if (end - start > MAX_BOOKING_MINUTES) return 'too_long';
+   if (blocked) return 'room_blocked';
+   for (const b of bookings) {
+     if (start < b.end && end > b.start) return 'overlap';
+```
+
 ### 8.2 The second fix
 
 **Finding:** V2
@@ -381,13 +407,13 @@ index 3ebc0d9..ecd5901 100644
 
  RUN  v3.2.7 /private/tmp/birjan-practice11-evidence/week-11/app
 
- ✓ src/explain.test.ts (12 tests) 6ms
+ ✓ src/explain.test.ts (12 tests) 5ms
  ✓ src/booking.test.ts (21 tests) 5ms
 
  Test Files  2 passed (2)
       Tests  33 passed (33)
-   Start at  13:32:03
-   Duration  256ms (transform 64ms, setup 0ms, collect 97ms, tests 11ms, environment 0ms, prepare 77ms)
+   Start at  13:35:00
+   Duration  209ms (transform 62ms, setup 0ms, collect 81ms, tests 11ms, environment 0ms, prepare 87ms)
 ```
 
 ### 8.4 Ready for demonstration?
