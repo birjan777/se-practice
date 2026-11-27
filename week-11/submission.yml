@@ -36,14 +36,14 @@ counts:
 
 decision:
   fixed: [V1, V2]
-  demo_ready: no
+  demo_ready: yes
 
 checker:
-  pass: 23
-  fail: 2
-  error: 2
-  commit: 3ba29d0
-  known_fails: [E1, E2, L7, L12]
+  pass: 26
+  fail: 1
+  error: 0
+  commit: 45987ca
+  known_fails: [L12]
 
 review_findings:
   - V1 was reproduced with an available result for a reversed interval. The inconsistent request now rejects.
