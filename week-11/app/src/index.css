@@ -8,6 +8,10 @@ button { margin-top: 1rem; padding: 0.6rem 1.2rem; border: 0; border-radius: 8px
 .available { color: #2f8f84; }
 .unavailable { color: #c0392b; }
 .error { color: #c0392b; margin-top: 0.75rem; }
+.explanation { padding: 0.75rem 1rem; background: #f5f7fa; border-radius: 8px; }
+.explanation button { margin-top: 0; }
+.failure-option { display: inline-flex; align-items: center; margin: 0.5rem; gap: 0.25rem; }
+.explanation p { margin: 0.75rem 0 0; line-height: 1.5; }
 @media (max-width: 480px) {
   .page { margin: 0; border-radius: 0; }
   .row { flex-direction: column; }

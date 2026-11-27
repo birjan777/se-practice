@@ -1,4 +1,4 @@
-import { canBook } from './booking';
+import { availabilityReason, type ReasonCode } from './booking';
 
 export const ROOM = {
   id: 'a101',
@@ -12,10 +12,12 @@ type AvailabilityRequest = {
   now: string;
   endOfDay: boolean;
   blocked: boolean;
-  bookings: Parameters<typeof canBook>[0]['bookings'];
+  bookings: Parameters<typeof availabilityReason>[0]['bookings'];
 };
 
-type AvailabilityResult = { available: boolean | null; error: string };
+type AvailabilityResult =
+  | { available: null; error: string }
+  | { available: boolean; reasonCode: ReasonCode; error: '' };
 
 function toMinutes(value: string): number {
   const [hours, minutes] = value.split(':').map(Number);
@@ -40,7 +42,7 @@ export function checkRoomAvailability({
     return { available: null, error: 'The end time must be after the start time.' };
   }
 
-  const available = canBook({
+  const reasonCode = availabilityReason({
     start: startMinutes,
     end: endMinutes,
     now: toMinutes(now),
@@ -48,5 +50,5 @@ export function checkRoomAvailability({
     bookings,
   });
 
-  return { available, error: '' };
+  return { available: reasonCode === 'available', reasonCode, error: '' };
 }
