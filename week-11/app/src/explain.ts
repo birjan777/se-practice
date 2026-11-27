@@ -47,6 +47,13 @@ function validateInput(value: unknown): ExplainInput {
       isAvailable !== (reasonCode === 'available')) {
     throw new Error('The availability status and reason must match the checker.');
   }
+  const minutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
+  const duration = minutes(end) - minutes(start);
+  if ((duration <= 0) !== (reasonCode === 'invalid_time') ||
+      (reasonCode === 'too_long' && duration <= 120) ||
+      (duration > 120 && reasonCode !== 'past_time' && reasonCode !== 'too_long')) {
+    throw new Error('The interval and reason must match the checker.');
+  }
   return Object.freeze({ roomLabel: label, start, end, isAvailable, reasonCode });
 }
 

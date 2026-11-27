@@ -88,3 +88,13 @@ describe('Explain availability', () => {
     expect(input.isAvailable).toBe(true);
   });
 });
+
+it('V1 F3: reject a checker status inconsistent with the supplied interval', async () => {
+  const adapter = vi.fn(mockAdapter);
+  const good = request('11:00', '12:00');
+  for (const end of ['10:30', '11:00', '14:00']) {
+    await expect(explainAvailability({ ...good, end }, adapter)).rejects.toThrow();
+  }
+  expect(adapter).not.toHaveBeenCalled();
+  expect((await explainAvailability(request('23:00', '24:00'), adapter)).source).toBe('generated');
+});
