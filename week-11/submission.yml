@@ -1,0 +1,59 @@
+schema: 1
+week: "11"
+
+student:
+  name: Khalenov Birzhan
+  student_id: 25B030042
+  github: birjan777
+
+assistant:
+  tool: Gemini
+  model: not displayed
+  environment: chat
+
+reviewer:
+  tool: Gemini
+  model: not displayed
+  same_model_as_builder: yes
+
+project:
+  starting_point: week-10
+  baseline_commit: 91783e9
+  language: ts
+  vitest: 3.2.7
+
+feature:
+  adapter: mock
+  timeout_ms: 1500
+  prompt_chosen: B
+
+counts:
+  tests_baseline: 21
+  tests_final: 33
+  cases_run: 9
+  findings_verified: 4
+  findings_confirmed: 4
+
+decision:
+  fixed: [V1, V2]
+  demo_ready: yes
+
+checker:
+  pass: 27
+  fail: 0
+  error: 0
+  commit: 45987ca
+  known_fails: []
+
+review_findings:
+  - V1 was reproduced with an available result for a reversed interval. The inconsistent request now rejects.
+  - V2 rejected the three grounded prompt B responses. All three now pass the complete statement check.
+  - V3 identified missing successful-but-invalid adapter output tests. The suite now covers a contradiction and an invented time.
+  - V4 identified the missing SYSTEM_INSTRUCTION export in the feature snapshot. The final module exports instruction B.
+
+honesty:
+  changes_reviewed_by_me: yes
+  no_key_in_browser: yes
+  review_was_read_only: yes
+  outputs_unedited: yes
+  ai_usage_disclosed: yes
