@@ -20,6 +20,8 @@
 
 **Terminal output pasted from real runs:** yes. The Vitest output blocks in §§2.2, 6.2 and 8.3 are from the recorded runs.
 
+Codex operated the running app to capture both browser screenshots and verify the UI row of §6.1.
+
 **Student can explain timeout and contradiction independently:** awaiting student confirmation.
 
 **Anything accepted without full understanding:** awaiting student review.

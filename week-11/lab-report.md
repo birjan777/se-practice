@@ -235,7 +235,7 @@ B explicitly identifies an existing booking in the overlap case. All three keep 
 | E7 | long input | Reject before adapter | 500 characters rejected; zero calls | pass | E7 F3: a 500-character label is rejected before the adapter runs |
 | E8 | timeout | Fallback at 40 ms | Unresolved at 39 ms; fallback at 40 ms | pass | E8 F4: an unanswered request falls back at the timeout |
 | E9 | simulated API failure | Local fallback; status preserved | Available fallback after throw | pass | E9 F4: a throwing adapter uses the local reason and preserves status |
-| UI | UI never changes the deterministic decision | Confirmed status stays visible in both modes | Source inspected; browser interaction still pending | not run | Pending direct browser check |
+| UI | UI never changes the deterministic decision | Confirmed status stays visible in both modes | Available remained visible for Room A-101, 11:00–12:00, in both modes | pass | In the running app, clicked Check availability and Explain availability, then enabled Simulate API failure and clicked Explain availability again. |
 
 ### 6.2 The run after the feature
 
@@ -256,8 +256,8 @@ B explicitly identifies an existing booking in the overlap case. All three keep 
 
 | File | What it shows |
 | --- | --- |
-| `evidence/explain-available.png` | Pending capture of the generated explanation alongside Available. |
-| `evidence/explain-fallback.png` | Pending capture of the same decision after simulated failure. |
+| `evidence/explain-available.png` | Room A-101, 11:00–12:00. Confirmed status: Available. Generated explanation (mock) is visible. |
+| `evidence/explain-fallback.png` | The same slot with Simulate API failure checked. Local fallback explanation is visible and the confirmed status remains Available. |
 
 ## 7. Task 6 — the agentic code review
 
@@ -418,19 +418,16 @@ index 3ebc0d9..ecd5901 100644
 
 ### 8.4 Ready for demonstration?
 
-**Ready:** no
+**Ready:** yes
 
 **What remains unresolved:**
 
-The full suite and build pass. The live UI demonstration, both screenshots and the student’s verification remain pending.
+The feature is ready for demonstration. The live browser check confirmed the same decision in both modes. Independent student verification and reflection remain pending for submission.
 
 ## 9. Checks I am keeping as FAIL or ERROR
 
 | Check | Why it stays |
 | --- | --- |
-| E1 | The available-state screenshot has not been captured. |
-| E2 | The fallback screenshot has not been captured. |
-| L7 | The nine automated cases pass. The browser interaction row is still pending. |
 | L12 | The course requires the student to write the reflection independently. |
 
 ## 10. Reflection
