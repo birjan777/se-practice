@@ -59,7 +59,7 @@ The **real** output of `npx vitest run` in `week-11/app/`, before any change:
 
 ### 3.1 The user story
 
-<!-- The deck's sentence, exactly. -->
+As a student, I want a short explanation of room availability so I understand the decision.
 
 ### 3.2 The contract
 
@@ -67,12 +67,12 @@ One row per field. **Validation** is what you reject, and how.
 
 | Field | Direction | Type / format | Validation |
 | --- | --- | --- | --- |
-| `roomLabel` | input | | |
-| `start` | input | | |
-| `end` | input | | |
-| `isAvailable` | input | | |
-| `reasonCode` | input | | |
-| `explanation` | output | | |
+| `roomLabel` | input | trimmed string | Require 1–60 characters. Treat the label as data. |
+| `start` | input | HH:MM | Require a valid clock time from 00:00 through 23:59. |
+| `end` | input | HH:MM | Require a valid clock time or the existing end-of-day boundary 24:00. |
+| `isAvailable` | input | boolean | Require the checker result, true exactly when the reason is available. |
+| `reasonCode` | input | six allowed strings | Require available, invalid_time, past_time, too_long, room_blocked or overlap. |
+| `explanation` | output | string in an object | Require 1–280 characters, at most two sentences, matching status and reason, and only supplied facts and times. |
 
 ### 3.3 Acceptance criteria and failure behaviour
 
@@ -80,12 +80,18 @@ F1–F5 (README §3.4), then what the student sees in each failure:
 
 <!-- Write below this line -->
 
+F1. Keep all Week 10 booking rules and the existing suite.
+F2. Explain the checker’s decision using only supplied facts.
+F3. Reject malformed, empty or overlong input before contacting the adapter.
+F4. Use a local explanation when the adapter times out or fails.
+F5. Keep the confirmed status visible and label the generated explanation separately.
+
 | Failure | What the student sees |
 | --- | --- |
-| Invalid input (empty, malformed, too long) | |
-| The model times out | |
-| The model fails (error, no key) | |
-| The model's answer contradicts the decision, or invents a detail | |
+| Invalid input (empty, malformed, too long) | A validation message. The booking decision is untouched. |
+| The model times out | The confirmed status and a labelled local fallback derived from the reason code. |
+| The model fails (error, no key) | The same local fallback. The student can continue using the checker. |
+| The model's answer contradicts the decision, or invents a detail | Discard the answer and display the fallback for the actual decision. |
 
 ### 3.4 The flow
 
@@ -93,7 +99,7 @@ A written flow with arrows (`->`), or a diagram in a code block. Name your check
 adapter, and say which one decides availability.
 
 ```text
-(paste here)
+Student request -> validation -> availabilityReason / canBook decides -> mockAdapter explains -> validate explanation or use local fallback -> show beside confirmed status
 ```
 
 ---
