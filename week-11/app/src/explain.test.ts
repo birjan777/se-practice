@@ -98,3 +98,24 @@ it('V1 F3: reject a checker status inconsistent with the supplied interval', asy
   expect(adapter).not.toHaveBeenCalled();
   expect((await explainAvailability(request('23:00', '24:00'), adapter)).source).toBe('generated');
 });
+
+it('V2 F2: accept all three grounded responses from the chosen instruction', async () => {
+  const examples: [ExplainInput, string][] = [
+    [request('11:00', '12:00'), 'Room A-101 is available from 11:00 to 12:00.'],
+    [request('10:30', '11:30'), 'Room A-101 is unavailable from 10:30 to 11:30 because the requested time overlaps with another booking.'],
+    [request('11:00', '12:00', true), 'Room A-101 is unavailable from 11:00 to 12:00 because the room is blocked.'],
+  ];
+  for (const [input, explanation] of examples) {
+    expect(await explainAvailability(input, () => ({ explanation }))).toEqual({ explanation, source: 'generated' });
+  }
+});
+
+it('V3 F2: discard a contradiction or invented time without changing the decision', async () => {
+  const input = request('11:00', '12:00');
+  for (const explanation of ['Room A-101 is unavailable from 11:00 to 12:00.', 'Room A-101 is available from 13:00 to 14:00.']) {
+    const result = await explainAvailability(input, () => ({ explanation }));
+    expect(result.source).toBe('fallback');
+    expect(result.explanation).toMatch(/\bis available\b/);
+    expect(input.isAvailable).toBe(true);
+  }
+});

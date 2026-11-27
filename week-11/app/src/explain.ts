@@ -75,12 +75,20 @@ function validateOutput(output: unknown, input: ExplainInput): string | undefine
   // negations, invented details and instructions hidden after a correct status.
   const normalized = text.toLowerCase();
   const status = statusSentence(input).toLowerCase();
-  const reason = reasonFacts[input.reasonCode];
+  // The mock uses "the room". The chosen prompt can also use a room identifier.
+  const subjects = [status];
+  if (/^Room [a-z0-9-]{1,32}$/i.test(input.roomLabel)) {
+    subjects.push(status.replace('the room', input.roomLabel.toLowerCase()));
+  }
+  const reasons = [reasonFacts[input.reasonCode]];
+  if (input.reasonCode === 'overlap') reasons.push('the requested time overlaps with another booking');
   const slot = ` from ${input.start} to ${input.end}`;
-  for (const statement of [status, status + slot]) {
-    if (normalized === `${statement} because ${reason}.` ||
-        normalized === `${statement}. ${reason}.` ||
-        (input.isAvailable && normalized === `${statement}.`)) return text;
+  for (const subject of subjects) {
+    for (const statement of [subject, subject + slot]) {
+      if (input.isAvailable && normalized === `${statement}.`) return text;
+      if (reasons.some(reason => normalized === `${statement} because ${reason}.` ||
+          normalized === `${statement}. ${reason}.`)) return text;
+    }
   }
 }
 
